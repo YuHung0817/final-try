@@ -21,7 +21,7 @@ protected:
     OurGameScene* getPlayScene();
     virtual void OnExplode();
 public:
-    explicit Bomb(std::string img,int x,int y);
+    explicit Bomb(std::string img,int x,int y,int t);
     void Update(float deltaTime) override;
 };
 #endif //INC_2024_I2P2_TOWERDEFENSE_WITH_ANSWER_BOMB_HPP

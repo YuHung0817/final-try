@@ -17,8 +17,8 @@ OurGameScene* Bomb::getPlayScene() {
 }
 void Bomb::OnExplode() {
 }
-Bomb::Bomb(std::string img, int x,int y) :
-        Sprite(img, x, y) ,timer(3.0){
+Bomb::Bomb(std::string img, int x,int y,int t) :
+        Sprite(img, x, y) ,timer(t){
     CollisionRadius = 1;//cna be adeed when the stage1
 }
 void Bomb::Update(float deltaTime) {

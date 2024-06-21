@@ -15,8 +15,8 @@
 #include "Engine/Point.hpp"
 //Box
 
-Box::Box(int x,int y) :
-        Instrument("our_game/box.png", x,y) {
+Box::Box(std::string img,int x,int y) :
+        Instrument(img, x,y) {
 }
 void Box::OnExplode() {
 }

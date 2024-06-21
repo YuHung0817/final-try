@@ -28,7 +28,6 @@ add_executable(2024_I2P2_TowerDefense_with_answer
         UI/Animation/ExplosionEffect.cpp
         UI/Animation/ExplosionEffect.hpp
         Bullet/FireBullet.cpp
-        Bullet/FireBullet.hpp
         Engine/GameEngine.cpp
         Engine/GameEngine.hpp
         Engine/Group.cpp
@@ -165,6 +164,12 @@ add_executable(2024_I2P2_TowerDefense_with_answer
         Instrument/Hammer.hpp
         Instrument/ToolBomb.cpp
         Instrument/ToolBomb.hpp
+        Bomb/FireEffect.cpp
+        Bomb/FireEffect.hpp
+        Bomb/HammerEffect.cpp
+        Bomb/HammerEffect.hpp
+        Bomb/FirearmEffect.cpp
+        Bomb/FirearmEffect.hpp
         #UI/Component/TextInput.cpp
         #UI/Component/TextInput.hpp
 

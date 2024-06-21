@@ -1,6 +1,7 @@
 //
 // Created by IRIS0817 on 2024/6/11.
 //
+#include <random>
 #include <allegro5/allegro.h>
 #include <algorithm>
 #include <cmath>
@@ -11,6 +12,7 @@
 #include <string>
 #include <memory>
 #include <iostream>
+#include <array>
 
 #include "Engine/AudioHelper.hpp"
 #include "UI/Animation/DirtyEffect.hpp"
@@ -37,6 +39,9 @@
 #include "Engine/Point.hpp"
 #include "Bomb/Bomb.hpp"
 #include "Bomb/Bomb1.hpp"
+#include "Bomb/FireEffect.hpp"
+#include "Bomb/FirearmEffect.hpp"
+#include "Bomb/HammerEffect.hpp"
 #include "Instrument/Instrument.hpp"
 #include "Instrument/Box.hpp"
 #include "Instrument/Firearm.hpp"
@@ -44,6 +49,7 @@
 #include "Instrument/Hammer.hpp"
 #include "Instrument/ToolBomb.hpp"
 
+float OurGameScene::timer=0;
 Box* OurGameScene::mapBox[25][13];
 Firearm* OurGameScene::mapFirearm[25][13];
 Bubble* OurGameScene::mapBubble[25][13];
@@ -76,6 +82,9 @@ void OurGameScene::Initialize() {
     AddNewObject(GroundEffectGroup = new Group());
     AddNewObject(DebugIndicatorGroup = new Group());
     AddNewObject(BombGroup = new Group());
+    AddNewObject(FireEffectGroup = new Group());
+    AddNewObject(FirearmEffectGroup = new Group());
+    AddNewObject(HammerEffectGroup = new Group());
     AddNewObject(InstrumentGroup =new Group());
     AddNewObject(RoleGroup = new Group());
     AddNewObject(EffectGroup = new Group());
@@ -96,10 +105,10 @@ void OurGameScene::Initialize() {
     bgmId = AudioHelper::PlayBGM("play.ogg");
 
     //add new role
-    role1 = new Role1(1 * BlockSize+20+5, 1 * BlockSize+20+5+5);
+    role1 = new Role1(1 * BlockSize, 1 * BlockSize);
     RoleGroup->AddNewObject(role1);
     //add new role
-    role2 = new Role2(23 * BlockSize+20, 11 * BlockSize+20+10);
+    role2 = new Role2(23 * BlockSize, 11 * BlockSize);
     RoleGroup->AddNewObject(role2);
 }
 void OurGameScene::Terminate() {
@@ -109,12 +118,7 @@ void OurGameScene::Terminate() {
     IScene::Terminate();
 }
 
-void OurGameScene::Update(float deltaTime) {
-    IScene::Update(deltaTime);
-    role1->Update(deltaTime);
-    role2->Update(deltaTime);
 
-}
 void OurGameScene::Draw() const {
     IScene::Draw();
     if (DebugMode) {
@@ -131,86 +135,147 @@ void OurGameScene::Draw() const {
         }
     }
 }
-//we need to have the two roles,
-//so ASDW,space and UpDownLeftRight,enter will need
+
+void OurGameScene::Update(float deltaTime) {
+    IScene::Update(deltaTime);
+
+    // Update roles
+    role1->Update(deltaTime);
+    role2->Update(deltaTime);
+    timer+=deltaTime*SpeedMult;
+    // Continuous key handling for role1
+    if(timer>=0.3) {
+        if (keys[ALLEGRO_KEY_UP]) {
+            int newX = role1->Position.x;
+            int newY = role1->Position.y - BlockSize/4;
+            if (CheckSpaceValid(newX, newY)) {
+                role1->SetDir(3);
+                role1->change = true;
+                role1->Position.y -= BlockSize/4;
+                TakeTool(role1);
+            }
+        }
+        if (keys[ALLEGRO_KEY_DOWN]) {
+            int newX = role1->Position.x;
+            int newY = role1->Position.y + BlockSize/4;
+            if (CheckSpaceValid(newX, newY)) {
+                role1->SetDir(2);
+                role1->change = true;
+                role1->Position.y += BlockSize/4;
+                TakeTool(role1);
+            }
+        }
+        if (keys[ALLEGRO_KEY_LEFT]) {
+            int newX = role1->Position.x - BlockSize/4;
+            int newY = role1->Position.y;
+            if (CheckSpaceValid(newX, newY)) {
+                role1->SetDir(0);
+                role1->change = true;
+                role1->Position.x -= BlockSize/4;
+                TakeTool(role1);
+            }
+        }
+        if (keys[ALLEGRO_KEY_RIGHT]) {
+            int newX = role1->Position.x + BlockSize/4;
+            int newY = role1->Position.y;
+            if (CheckSpaceValid(newX, newY)) {
+                role1->SetDir(1);
+                role1->change = true;
+                role1->Position.x += BlockSize/4;
+                TakeTool(role1);
+            }
+        }
+
+        // Continuous key handling for role2
+        if (keys[ALLEGRO_KEY_W]) {
+            int newX = role2->Position.x;
+            int newY = role2->Position.y - BlockSize/4 ;
+            if (CheckSpaceValid(newX, newY)) {
+                role2->SetDir(3);
+                role2->change = true;
+                role2->Position.y -= BlockSize/4;
+                TakeTool(role2);
+            }
+        }
+        if (keys[ALLEGRO_KEY_S]) {
+            int newX = role2->Position.x;
+            int newY = role2->Position.y + BlockSize/4;
+            if (CheckSpaceValid(newX, newY)) {
+                role2->SetDir(2);
+                role2->change = true;
+                role2->Position.y += BlockSize/4;
+                TakeTool(role2);
+            }
+        }
+        if (keys[ALLEGRO_KEY_A]) {
+            int newX = role2->Position.x - BlockSize/4;
+            int newY = role2->Position.y;
+            if (CheckSpaceValid(newX, newY)) {
+                role2->SetDir(0);
+                role2->change = true;
+                role2->Position.x -= BlockSize/4 ;
+                TakeTool(role2);
+            }
+        }
+        if (keys[ALLEGRO_KEY_D]) {
+            int newX = role2->Position.x + BlockSize/4 ;
+            int newY = role2->Position.y;
+            if (CheckSpaceValid(newX, newY)) {
+                role2->SetDir(1);
+                role2->change = true;
+                role2->Position.x += BlockSize/4;
+                TakeTool(role2);
+            }
+        }
+        timer=0;
+    }
+}
 void OurGameScene::OnKeyDown(int keyCode) {
-    IScene::OnKeyDown(keyCode);
-    if (keyCode == ALLEGRO_KEY_TAB) {
-        DebugMode = !DebugMode;
+    keys[keyCode] = true;
+    // Check code
+    keyStrokes.push_back(keyCode);
+    if (keyStrokes.size() > code.size()) {
+        keyStrokes.pop_front();
     }
-    /*******/
-    if (keyCode == ALLEGRO_KEY_UP) {
-        int newX=role1->Position.x;
-        int newY=role1->Position.y-BlockSize;
-        if(CheckSpaceValid(newX,newY)) {
-            role1->Position.y -= BlockSize;
-            TakeTool(role1);
+    if (std::deque<int>(keyStrokes.begin(), keyStrokes.end()) == std::deque<int>(code.begin(), code.end())) {
+        EffectGroup->AddNewObject(new Plane());
+        keyStrokes.clear();
+    }
+    if (keyCode== ALLEGRO_KEY_ENTER){
+        //no other on the hand ,put bomb
+        //or put the first get tool
+        std::string tmp=role1->UseTool();
+        if(tmp=="") PutBomb(role1->Position.x,role1->Position.y);
+        else if(tmp=="Firearm"){
+            std::cout<<"to functino\n";
+            firearmEffect(role1->Position.x,role1->Position.y,role1);
+        }else if(tmp=="ToolBomb"){
+
+        }else if(tmp=="Hammer"){
+            hammerEffect(role1->Position.x,role1->Position.y,role1);
         }
-    } else if (keyCode == ALLEGRO_KEY_DOWN) {
-        int newX=role1->Position.x;
-        int newY=role1->Position.y+BlockSize;
-        if(CheckSpaceValid(newX,newY)) {
-            role1->Position.y += BlockSize;
-            TakeTool(role1);
+    }
+    if(keyCode ==ALLEGRO_KEY_SPACE){
+
+        std::string tmp=role2->UseTool();
+        if(tmp=="") PutBomb(role2->Position.x,role2->Position.y);
+        else if(tmp=="Firearm"){
+            firearmEffect(role2->Position.x,role2->Position.y,role2);
+        }else if(tmp=="ToolBomb"){
+
+        }else if(tmp=="Hammer"){
+            hammerEffect(role2->Position.x,role2->Position.y,role2);
         }
-    } else if (keyCode == ALLEGRO_KEY_LEFT) {
-        int newX=role1->Position.x-BlockSize;
-        int newY=role1->Position.y;
-        if(CheckSpaceValid(newX,newY)) {
-            role1->Position.x -= BlockSize;
-            TakeTool(role1);
-        }
-    } else if (keyCode == ALLEGRO_KEY_RIGHT) {
-        int newX=role1->Position.x+BlockSize;
-        int newY=role1->Position.y;
-        if(CheckSpaceValid(newX,newY)) {
-            role1->Position.x += BlockSize;
-            TakeTool(role1);
-        }
-    }else if (keyCode== ALLEGRO_KEY_ENTER){
-    //no other on the hand ,put bomb
-    //or put the first get tool
-        PutBomb(role1->Position.x,role1->Position.y);
     }
 
-
-     if (keyCode == ALLEGRO_KEY_W) {
-        int newX=role2->Position.x;
-        int newY=role2->Position.y-BlockSize;
-        if(CheckSpaceValid(newX,newY)) {
-            role2->Position.y -= BlockSize;
-            TakeTool(role2);
-        }
-    } else if (keyCode == ALLEGRO_KEY_S) {
-        int newX=role2->Position.x;
-        int newY=role2->Position.y+BlockSize;
-        if(CheckSpaceValid(newX,newY)) {
-            role2->Position.y += BlockSize;
-            TakeTool(role2);
-        }
-    } else if (keyCode == ALLEGRO_KEY_A) {
-        int newX=role2->Position.x-BlockSize;
-        int newY=role2->Position.y;
-        if(CheckSpaceValid(newX,newY)) {
-            role2->Position.x -= BlockSize;
-            TakeTool(role2);
-        }
-    } else if (keyCode == ALLEGRO_KEY_D) {
-        int newX=role2->Position.x+BlockSize;
-        int newY=role2->Position.y;
-        if(CheckSpaceValid(newX,newY)) {
-            role2->Position.x += BlockSize;
-            TakeTool(role2);
-        }
-    }else if(keyCode ==ALLEGRO_KEY_SPACE){
-         PutBomb(role2->Position.x,role2->Position.y);
-     }
-    /**********/
-        // TODO: [CUSTOM-TURRET]: Make specific key to create the turret.
-    else if (keyCode >= ALLEGRO_KEY_0 && keyCode <= ALLEGRO_KEY_9) {
+    if (keyCode >= ALLEGRO_KEY_0 && keyCode <= ALLEGRO_KEY_9) {
         // Hotkey for Speed up.
         SpeedMult = keyCode - ALLEGRO_KEY_0;
     }
+}
+
+void OurGameScene::OnKeyUp(int keyCode) {
+    keys[keyCode] = false;
 }
 //need but hte same problem to the next function
 void OurGameScene::Hit() {
@@ -252,6 +317,7 @@ void OurGameScene::ReadMap() {
         throw std::ios_base::failure("Map data is corrupted.");
     // Store map in 2d array.
     mapState = std::vector<std::vector<TileType>>(MapHeight, std::vector<TileType>(MapWidth));
+    ValidState = std::vector<std::vector<bool>>(MapHeight*4 , std::vector<bool>(MapWidth*4));
     for (int i = 0; i < MapHeight; i++) {
         for (int j = 0; j < MapWidth; j++) {
             const int num = mapData[i * MapWidth + j];
@@ -260,19 +326,51 @@ void OurGameScene::ReadMap() {
 
            // mapState[i][j] = num ? TILE_FLOOR : TILE_DIRT;
            //chage to the following
-            if(num==0) mapState[i][j]=TILE_FLOOR;
-            else if(num==1) mapState[i][j]=TILE_WALL;
+            for(int p=0;p<4;p++) {
+                for(int q=0;q<4;q++) {
+                    ValidState[i*4+p][j*4+q] = true;
+                }
+            }
+
+            if(num==0) {
+                mapState[i][j] = TILE_FLOOR;
+            }
+            else if(num==1) {
+                mapState[i][j] = TILE_WALL;
+                for(int p=0;p<4;p++) {
+                    for(int q=0;q<4;q++) {
+                        ValidState[i*4+p][j*4+q] = false;
+                    }
+                }
+            }
             else if(num==2) mapState[i][j]=TILE_OCCUPIED;
             else if(num==3) mapState[i][j]=TILE_TOOL_BOMB;
             else if(num==4) mapState[i][j]=TILE_TOOL_FIREARM;
             else if(num==5) mapState[i][j]=TILE_TOOL_HAMMER;
-            else mapState[i][j]=TILE_BLOCK;
+            else{
+                mapState[i][j]=TILE_BLOCK;
+                //64/8=8
+                for(int p=0;p<4;p++) {
+                    for(int q=0;q<4;q++) {
+                        ValidState[i*4+p][j*4+q] = false;
+                    }
+                }
+            }
 
 
-            if (num==0) {
-                TileMapGroup->AddNewObject(new Engine::Image("our_game/floor.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
+
+            TileMapGroup->AddNewObject(new Engine::Image("our_game/floor3.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
+            if(num==0){
+               // TileMapGroup->AddNewObject(new Engine::Image("our_game/snow.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
             }else if(num==1) {
-                TileMapGroup->AddNewObject(new Engine::Image("our_game/wall3.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
+                //wall
+                /*std::random_device rd;
+                std::mt19937 gen(rd());
+                std::uniform_int_distribution<> dis(1, 4);
+                int random_number = dis(gen);
+                std::string random_number_str = std::to_string(random_number);
+                std::string home_wall="our_game/tree"+random_number_str+".png";*/
+                TileMapGroup->AddNewObject(new Engine::Image("our_game/snowman.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
             }else if(num==2){
                 //TileMapGroup->AddNewObject(new Engine::Image("our_game/dirt.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
             }else if(num==3){
@@ -305,7 +403,13 @@ void OurGameScene::ReadMap() {
                 mapHammer[i][j]=hammer;
             }else if(num==6){
                 TileMapGroup->AddNewObject(new Engine::Image("our_game/floor.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
-                Box* box=new Box(j * BlockSize+40, i * BlockSize+28);
+                /*std::random_device rd;
+                std::mt19937 gen(rd());
+                std::uniform_int_distribution<> dis(1, 3);
+                int random_number = dis(gen);
+                std::string random_number_str = std::to_string(random_number);
+                std::string box_home="our_game/home"+random_number_str+".png";*/
+                Box* box=new Box("our_game/box.png",j * BlockSize+40, i * BlockSize+28);
                 InstrumentGroup->AddNewObject(box);
                 mapBox[i][j]= box;
 
@@ -402,14 +506,21 @@ void OurGameScene::ConstructUI() {
 
 //should be changed to check wheather the space can go through, if tool or wall there can't go but the enemy can go
 bool OurGameScene::CheckSpaceValid(int x, int y) {
-    int j=x/64;
+   // if(x/64)
+    int q=x/16;
+    int p=y/16;
     int i=y/64;
-    std::cout<<"i = "<<i<<" j= "<<j<<std::endl;
-    if(/*mapState[i][j]==TILE_FLOOR &&*/ i>0 && j>0 && j<24 && i<12 ) {
-        if(mapState[i][j]==TILE_FLOOR || mapState[i][j]==TILE_TOOL_FIREARM || mapState[i][j]==TILE_TOOL_BOMB || mapState[i][j]==TILE_TOOL_HAMMER) {
+    int j=x/64;
+
+    if (i > 0 && j > 0 && j < 24 && i < 12) {
+        /*if (mapState[p][q] == TILE_FLOOR || mapState[p][q] == TILE_OCCUPIED ||
+            mapState[p][q] == TILE_TOOL_FIREARM || mapState[p][q] == TILE_TOOL_BOMB ||
+            mapState[p][q] == TILE_TOOL_HAMMER) {
             return true;
-        }
+        }*/
+        if( ValidState[p][q] ) return true;
     }
+
     return false;
 }
 
@@ -419,7 +530,7 @@ void OurGameScene::PutBomb(int x,int y){
     int j=x/64;
     mapState[i][j]=TILE_OCCUPIED;
     //
-    Bomb1* bomb=new Bomb1(x,y);
+    Bomb1* bomb=new Bomb1(j*64+40,i*64+40,3.0);
     BombGroup->AddNewObject(bomb);
 
 }
@@ -427,6 +538,8 @@ void OurGameScene::ClearBomb(int x,int y,int radius){
     int i=y/64;
     int j=x/64;
     mapState[i][j]=TILE_FLOOR;
+    FireEffect* fireeffect=new FireEffect(j*64+40,i*64+40,3.0);
+    FireEffectGroup->AddNewObject(fireeffect);
     int dir[4][2]={{1,0},{-1,0},{0,1},{0,-1}};
     for(int k=0;k<4;k++){
         int I=i;
@@ -436,13 +549,24 @@ void OurGameScene::ClearBomb(int x,int y,int radius){
             J += dir[k][1];
             if (I > 0 && J > 0 && I < 13 && J < 25) {
                 //check the player
+                if(mapState[I][J]!=TILE_WALL){
+                    FireEffect* fireeffect=new FireEffect(J*64+40,I*64+40,3.0);
+                    FireEffectGroup->AddNewObject(fireeffect);
+                }
                 CheckDie(I,J);
+
                 if (mapState[I][J] == TILE_BLOCK) {
-                    std::cout<<"to remove\n";
                     Box* tmp=mapBox[I][J];
                     InstrumentGroup->RemoveObject(tmp->GetObjectIterator());
                     mapState[I][J] = TILE_FLOOR;
+                    for(int p=0;p<4;p++){
+                        for(int q=0;q<4;q++){
+                            ValidState[I*4+p][J*4+q]=true;
+                        }
+                    }
+                    break;
                 }
+
             }
         }
     }
@@ -457,6 +581,8 @@ void OurGameScene::TakeTool(Role* r){
 
         Bubble* tmp2=mapBubble[i][j];
         InstrumentGroup->RemoveObject(tmp2->GetObjectIterator());
+
+        r->gettool("Firearm");
     }
     else if(mapState[i][j] == TILE_TOOL_HAMMER){
         Hammer* tmp=mapHammer[i][j];
@@ -465,6 +591,8 @@ void OurGameScene::TakeTool(Role* r){
 
         Bubble* tmp2=mapBubble[i][j];
         InstrumentGroup->RemoveObject(tmp2->GetObjectIterator());
+
+        r->gettool("Hammer");
     }
     else if(mapState[i][j] == TILE_TOOL_BOMB){
         ToolBomb* tmp=mapToolBomb[i][j];
@@ -473,6 +601,8 @@ void OurGameScene::TakeTool(Role* r){
 
         Bubble* tmp2=mapBubble[i][j];
         InstrumentGroup->RemoveObject(tmp2->GetObjectIterator());
+
+        r->gettool("ToolBomb");
     }
 }
 void OurGameScene::CheckDie(int i,int j){
@@ -480,14 +610,73 @@ void OurGameScene::CheckDie(int i,int j){
     int x_r=j*64+32;
     int y_u=i*64-32;
     int y_d=i*64+32;
-    std::cout<<"x= "<<x_l<<" y="<<y_u<<std::endl;
-    std::cout<<"role1->Position.x"<<role1->Position.x;
-    std::cout<<"   role1->Position.y"<<role1->Position.y;
-    std::cout<<std::endl;
     if((role1->Position.x >= x_l  && role1->Position.x <= x_r )&& (role1->Position.y >= y_u && role1->Position.y <= y_d)){
         Engine::GameEngine::GetInstance().ChangeScene("lose");
     }
     if((role2->Position.x >= x_l  && role2->Position.x <= x_r )&& (role2->Position.y >= y_u && role2->Position.y <= y_d)){
         Engine::GameEngine::GetInstance().ChangeScene("lose");
     }
+}
+
+void OurGameScene::firearmEffect(int x,int y,Role* r){
+    std::cout<<"firearmEffect function\n";
+    int j=x/64;
+    int i=y/64;
+    int T=3;
+    int d=r->ReturnDir();
+    int i_d,j_d;
+
+    if(d==0){
+        //left
+        i_d=0; j_d=-1;
+    }else if(d==1){
+        //right
+        i_d=0; j_d=1;
+    }else if(d==2){
+        //down
+        i_d=1; j_d=0;
+    }else if(d==3){
+        //up
+        i_d=-1; j_d=0;
+    }
+
+    while(T--){
+        i+=i_d;
+        j+=j_d;
+        if(mapState[i][j]!=TILE_WALL){
+            FirearmEffect* firearmeffect=new FirearmEffect(j*64+40,i*64+40,3.0);
+            FirearmEffectGroup->AddNewObject(firearmeffect);
+        }
+    }
+}
+
+void OurGameScene::hammerEffect(int x,int y,Role* r){
+    int j=x/64;
+    int i=y/64;
+    std::cout<<"ioioioi\n";
+    int d=r->ReturnDir();
+    int i_d,j_d;
+    std::cout<<"ioioioi\n";
+    if(d==0){
+        //left
+        i_d=0; j_d=-1;
+    }else if(d==1){
+        //right
+        i_d=0; j_d=1;
+    }else if(d==2){
+        //down
+        i_d=1; j_d=0;
+    }else if(d==3){
+        //up
+        i_d=-1; j_d=0;
+    }
+    i+=i_d*2;
+    j+=j_d*2;
+    std::cout<<"Yes1\n";
+    if(mapState[i][j]!=TILE_WALL){
+        std::cout<<"Yes2\n";
+        HammerEffect* hammereffect=new HammerEffect(j*64+40,i*64+40,4.0);
+        HammerEffectGroup->AddNewObject(hammereffect);
+    }
+
 }

@@ -18,7 +18,7 @@ protected:
     //const float rotateRadian = 2 * ALLEGRO_PI;
     //std::list<Bullet*>::iterator lockedBulletIterator;
 public:
-    explicit Bomb1(int x,int y);
+    explicit Bomb1(int x,int y,int t);
     virtual void Update(float deltaTime) override;
     void OnExplode() override;
 };

@@ -14,6 +14,9 @@
 #include "role/Role1.hpp"
 #include "role/Role2.hpp"
 #include "Bomb/Bomb.hpp"
+#include "Bomb/FireEffect.hpp"
+#include "Bomb/HammerEffect.hpp"
+#include "Bomb/FirearmEffect.hpp"
 #include "Instrument/Instrument.hpp"
 #include "Instrument/Box.hpp"
 #include "Instrument/Firearm.hpp"
@@ -45,9 +48,11 @@ private:
     };
     ALLEGRO_SAMPLE_ID bgmId;
     std::shared_ptr<ALLEGRO_SAMPLE_INSTANCE> deathBGMInstance;
+    std::array<bool, ALLEGRO_KEY_MAX> keys;
 protected:
     int SpeedMult;
 public:
+    static float timer;
     static bool DebugMode;
     static const std::vector<Engine::Point> directions;
     static const int MapWidth, MapHeight;
@@ -68,6 +73,9 @@ public:
     Group* GroundEffectGroup;
     Group* DebugIndicatorGroup;
     Group* BombGroup;
+    Group* FireEffectGroup;
+    Group* FirearmEffectGroup;
+    Group* HammerEffectGroup;
     Group* RoleGroup;
     Group* InstrumentGroup;
     Group* EffectGroup;
@@ -75,6 +83,7 @@ public:
     Engine::Image* imgTarget;
     Engine::Sprite* dangerIndicator;
     std::vector<std::vector<TileType>> mapState;
+    std::vector<std::vector<bool>> ValidState;
     std::list<int> keyStrokes;
     static Engine::Point GetClientSize();
     explicit OurGameScene() = default;
@@ -86,6 +95,7 @@ public:
     void ClearBomb(int x,int y,int radius);
     /******/
     /*******/
+    void OnKeyUp(int keyCode) override;
     void OnKeyDown(int keyCode) override;
     void Hit();
     void ReadMap();
@@ -94,6 +104,8 @@ public:
     bool CheckSpaceValid(int x, int y);
     void TakeTool(Role* role);
     void CheckDie(int i,int j);
+    void firearmEffect(int x,int y,Role* r);
+    void hammerEffect(int x,int y,Role* r);
     // void ModifyReadMapTiles();
 };
 

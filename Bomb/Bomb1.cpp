@@ -15,8 +15,8 @@
 #include "Engine/Point.hpp"
 //Bomb1
 
-Bomb1::Bomb1(int x,int y) :
-        Bomb("our_game/bomb2.png", x,y) {
+Bomb1::Bomb1(int x,int y,int t) :
+        Bomb("our_game/bomb2.png", x,y,t) {
 }
 void Bomb1::OnExplode() {
 }
