@@ -1,4 +1,3 @@
-
 # 2024 I2P Mini Project 3 - Farm Battle
 This is a two-player battle game that combines farming.  The purpose of the game is to kill the opponent player. Players need to grow vegetables to earn money, which can be used to obtain items in battle mode.  
 we cut this game into three parts:  
@@ -6,6 +5,8 @@ we cut this game into three parts:
 **1.Game Scene  
 2.FarmScene(our feature 1)  
 3.Store Scene(our feature 2)**  
+
+## Source Code:https://github.com/YuHung0817/final-try
 
 ## 1. Game Scene
 All roles have infinite amount of bombs, it can be put when the role has no tool.
