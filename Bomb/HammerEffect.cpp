@@ -8,6 +8,7 @@
 #include <iostream>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/color.h>
+#include "Engine/AudioHelper.hpp"
 
 #include "UI/Animation/DirtyEffect.hpp"
 #include "Engine/Group.hpp"
@@ -23,6 +24,7 @@ int HammerEffect::offset=0;
 int HammerEffect::frameIndex=0;
 HammerEffect::HammerEffect(int x,int y,int t) :
         Bomb("our_game/hammereffect.png", x,y,t){
+            AudioHelper::PlayAudio("hammer.wav");
 }
 void HammerEffect::OnExplode() {
 }
@@ -46,6 +48,7 @@ void HammerEffect::Update(float deltaTime) {
         scene->CheckDie(i,j);
         std::cout<<"time=0\n";
         OnExplode();
+        
         getPlayScene()->FireEffectGroup->RemoveObject(objectIterator);
         //scene->ClearBomb(Position.x,Position.y,CollisionRadius);
     }

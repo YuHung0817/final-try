@@ -8,7 +8,7 @@
 #include <iostream>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/color.h>
-
+#include "Engine/AudioHelper.hpp"
 #include "UI/Animation/DirtyEffect.hpp"
 #include "Engine/Group.hpp"
 #include "Engine/IObject.hpp"
@@ -22,6 +22,7 @@ int FirearmEffect::offset=0;
 int FirearmEffect::frameIndex=0;
 FirearmEffect::FirearmEffect(int x,int y,int t) :
         Bomb("our_game/firearmeffect2.png", x,y,t) {
+            AudioHelper::PlayAudio("lasar.wav");
 }
 void FirearmEffect::OnExplode() {
 }
@@ -48,6 +49,7 @@ void FirearmEffect::Update(float deltaTime) {
         //
         std::cout<<"time=0\n";
         OnExplode();
+        
         getPlayScene()->FirearmEffectGroup->RemoveObject(objectIterator);
         //scene->ClearBomb(Position.x,Position.y,CollisionRadius);
     }

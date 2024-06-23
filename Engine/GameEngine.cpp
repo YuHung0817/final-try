@@ -71,7 +71,7 @@ namespace Engine {
 		al_register_event_source(event_queue, al_get_keyboard_event_source());
 		al_register_event_source(event_queue, al_get_mouse_event_source());
 		// Can register other event sources, such as timer, video, ...
-
+		
 		// Start the timer to update and draw the game.
 		al_start_timer(update_timer);
 	}

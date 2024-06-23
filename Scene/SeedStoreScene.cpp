@@ -10,6 +10,7 @@
 #include "UI/Component/Label.hpp"
 #include "LoseScene.hpp"
 #include "PlayScene.hpp"
+#include "Engine/AudioHelper.hpp"
 #include "Engine/Point.hpp"
 #include "Engine/LOG.hpp"
 
@@ -26,17 +27,25 @@ void SeedStoreScene::ReadMoney() {
     //Engine::LOG(Engine::DEBUGGING) <<money1;
 }
 void SeedStoreScene::Initialize() {
-    AddNewObject(WindowGroup = new Group());
+    AddNewObject(new Engine::Image("stage-select/background.png", 0, 0, 1700, 1100));
+    AddNewObject(MarkGroup = new Group());
     int w = Engine::GameEngine::GetInstance().GetScreenSize().x;
     int h = Engine::GameEngine::GetInstance().GetScreenSize().y;
     int halfW = w / 2;
     int halfH = h / 2;
 
+    position_x[1][0]=halfW * 1 / 5 + 75;
+    position_x[1][1]=halfW * 3 / 5 + 75;
+    position_x[2][0]=halfW * 7 / 5 + 75;
+    position_x[2][1]=halfW * 9 / 5 + 75;
+    position_y[0]=halfH - 7-100;
+    position_y[1]=halfH +200 - 7-100;
+
     //AddNewObject(new Engine::Image("Potion/background.png", halfW, halfH * 1 / 2, 0, 0, 0.5, 0.5));
     AddNewObject(new Engine::Image("Seed/top.png", halfW, halfH * 1 / 2, 0, 0, 0.5, 0.92));
     AddNewObject(new Engine::Label("Seed store", "pirulen.ttf", 70, halfW, halfH * 1 / 4 + 20, 0, 0, 0, 255, 0.5, 0.5));
-    AddNewObject(new Engine::Label("Player 1", "pirulen.ttf", 48, halfW * 1 / 2, halfH * 7 / 4, 255, 255, 255, 255, 0.5, 0.5));
-    AddNewObject(new Engine::Label("Player 2", "pirulen.ttf", 48, halfW * 3 / 2, halfH * 7 / 4, 255, 255, 255, 255, 0.5, 0.5));
+    AddNewObject(new Engine::Label("Player 1", "pirulen.ttf", 48, halfW * 1 / 2, halfH * 7 / 4, 0, 0, 0, 255, 0.5, 0.5));
+    AddNewObject(new Engine::Label("Player 2", "pirulen.ttf", 48, halfW * 3 / 2, halfH * 7 / 4, 0, 0, 0, 255, 0.5, 0.5));
 
     AddNewControlObject(new Engine::Window(1, "Seed/Seed2.png", "Seed/window1.png", "Wheat", halfW* 1 / 5, halfH-70, 0, 0, 0.5, 0.5));
     AddNewControlObject(new Engine::Window(1, "Seed/Seed1.png", "Seed/window2.png", "vegetable", halfW* 3 / 5, halfH-70, 0, 0, 0.5, 0.5));
@@ -48,61 +57,61 @@ void SeedStoreScene::Initialize() {
     AddNewControlObject(new Engine::Window(1, "Seed/Seed4.png", "Seed/window4.png", "Flower", halfW* 9 / 5, halfH+120, 0, 0, 0.5, 0.5));
 
     Engine::ImageButton* btn;
-    btn = new Engine::ImageButton("Seed/dirt.png", "Seed/floor.png", halfW - 100, halfH * 7 / 4 - 25, 200, 50);
+    btn = new Engine::ImageButton("stage-select/back.png", "stage-select/on.png", halfW - 100, halfH * 7 / 4 - 25, 200, 50);
     btn->SetOnClickCallback(std::bind(&SeedStoreScene::NextOnClick, this, 2));
     AddNewControlObject(btn);
     AddNewObject(new Engine::Label("Next", "pirulen.ttf", 24, halfW, halfH * 7 / 4, 0, 0, 0, 255, 0.5, 0.5));
     ReadMoney();
     //buy button
     //player1
-    btn = new Engine::ImageButton("Seed/dirt.png", "Seed/floor.png", halfW * 1 / 5 - 75, halfH-25, 150, 50);
+    btn = new Engine::ImageButton("stage-select/back.png", "stage-select/on.png", halfW * 1 / 5 - 75, halfH-25, 150, 50);
     btn->SetOnClickCallback(std::bind(&SeedStoreScene::BuyOnClick, this, 1, 0));
     AddNewControlObject(btn);
     AddNewObject(new Engine::Label("Get", "pirulen.ttf", 24, halfW* 1 / 5, halfH, 0, 0, 0, 255, 0.5, 0.5));
 
     if(money1>=5) {
-    btn = new Engine::ImageButton("Seed/dirt.png", "Seed/floor.png", halfW * 3 / 5 - 75, halfH-25, 150, 50);
+    btn = new Engine::ImageButton("stage-select/back.png", "stage-select/on.png", halfW * 3 / 5 - 75, halfH-25, 150, 50);
     btn->SetOnClickCallback(std::bind(&SeedStoreScene::BuyOnClick, this, 1, 5));
     AddNewControlObject(btn);
     }else AddNewObject(new Engine::Image("Potion/gray.png", halfW * 3 / 5 - 75, halfH+-25, 150, 50));
     AddNewObject(new Engine::Label("$5", "pirulen.ttf", 24, halfW* 3 / 5, halfH+0, 0, 0, 0, 255, 0.5, 0.5));
 
     if(money1 >= 10) {
-        btn = new Engine::ImageButton("Seed/dirt.png", "Seed/floor.png", halfW * 1 / 5 - 75, halfH + 200 - 25, 150, 50);
+        btn = new Engine::ImageButton("stage-select/back.png", "stage-select/on.png", halfW * 1 / 5 - 75, halfH + 200 - 25, 150, 50);
         btn->SetOnClickCallback(std::bind(&SeedStoreScene::BuyOnClick, this, 1, 10));
         AddNewControlObject(btn);
     } else AddNewObject(new Engine::Image("Potion/gray.png", halfW * 1 / 5 - 75, halfH + 200 - 25, 150, 50));
     AddNewObject(new Engine::Label("$10", "pirulen.ttf", 24, halfW * 1 / 5, halfH + 200, 0, 0, 0, 255, 0.5, 0.5));
 
     if(money1 >= 60) {
-        btn = new Engine::ImageButton("Seed/dirt.png", "Seed/floor.png", halfW * 3 / 5 - 75, halfH + 200 - 25, 150, 50);
+        btn = new Engine::ImageButton("stage-select/back.png", "stage-select/on.png", halfW * 3 / 5 - 75, halfH + 200 - 25, 150, 50);
         btn->SetOnClickCallback(std::bind(&SeedStoreScene::BuyOnClick, this, 1, 60));
         AddNewControlObject(btn);
         } else AddNewObject(new Engine::Image("Potion/gray.png", halfW * 3 / 5 - 75, halfH + 200 - 25, 150, 50));
     AddNewObject(new Engine::Label("$60", "pirulen.ttf", 24, halfW * 3 / 5, halfH + 200, 0, 0, 0, 255, 0.5, 0.5));
 
     // player2
-    btn = new Engine::ImageButton("Seed/dirt.png", "Seed/floor.png", halfW * 7 / 5 - 75, halfH - 25, 150, 50);
+    btn = new Engine::ImageButton("stage-select/back.png", "stage-select/on.png", halfW * 7 / 5 - 75, halfH - 25, 150, 50);
     btn->SetOnClickCallback(std::bind(&SeedStoreScene::BuyOnClick, this, 2, 0));
     AddNewControlObject(btn);
     AddNewObject(new Engine::Label("Get", "pirulen.ttf", 24, halfW * 7 / 5, halfH, 0, 0, 0, 255, 0.5, 0.5));
 
     if(money2 >= 5) {
-        btn = new Engine::ImageButton("Seed/dirt.png", "Seed/floor.png", halfW * 9 / 5 - 75, halfH - 25, 150, 50);
+        btn = new Engine::ImageButton("stage-select/back.png", "stage-select/on.png", halfW * 9 / 5 - 75, halfH - 25, 150, 50);
         btn->SetOnClickCallback(std::bind(&SeedStoreScene::BuyOnClick, this, 2, 5));
         AddNewControlObject(btn);
         }else AddNewObject(new Engine::Image("Potion/gray.png", halfW * 9 / 5 - 75, halfH - 25, 150, 50));
     AddNewObject(new Engine::Label("$5", "pirulen.ttf", 24, halfW * 9 / 5, halfH, 0, 0, 0, 255, 0.5, 0.5));
 
     if(money2 >= 10) {
-        btn = new Engine::ImageButton("Seed/dirt.png", "Seed/floor.png", halfW * 7 / 5 - 75, halfH + 200 - 25, 150, 50);
+        btn = new Engine::ImageButton("stage-select/back.png", "stage-select/on.png", halfW * 7 / 5 - 75, halfH + 200 - 25, 150, 50);
         btn->SetOnClickCallback(std::bind(&SeedStoreScene::BuyOnClick, this, 2, 10));
         AddNewControlObject(btn);
     } else AddNewObject(new Engine::Image("Potion/gray.png", halfW * 7 / 5 - 75, halfH + 200 - 25, 150, 50));
     AddNewObject(new Engine::Label("$10", "pirulen.ttf", 24, halfW * 7 / 5, halfH + 200, 0, 0, 0, 255, 0.5, 0.5));
 
     if(money2 >= 60) {
-        btn = new Engine::ImageButton("Seed/dirt.png", "Seed/floor.png", halfW * 9 / 5 - 75, halfH + 200 - 25, 150, 50);
+        btn = new Engine::ImageButton("stage-select/back.png", "stage-select/on.png", halfW * 9 / 5 - 75, halfH + 200 - 25, 150, 50);
         btn->SetOnClickCallback(std::bind(&SeedStoreScene::BuyOnClick, this, 2, 60));
         AddNewControlObject(btn);
     } else AddNewObject(new Engine::Image("Potion/gray.png", halfW * 9 / 5 - 75, halfH + 200 - 25, 150, 50));
@@ -112,6 +121,19 @@ void SeedStoreScene::Initialize() {
     std::string output_money_2 = "$"+std::to_string(money2);
     AddNewObject(new Engine::Label( output_money_1,"pirulen.ttf", 30, halfW * 1 / 2 - 300, halfH * 3 / 5, 150, 0, 0, 255, 0.5, 0.5));
     AddNewObject(new Engine::Label( output_money_2,"pirulen.ttf", 30, halfW * 3 / 2 + 300, halfH * 3 / 5, 150, 0, 0, 255, 0.5, 0.5));
+
+    for(int i=1; i<=2; i++) {
+        for(int j=0; j<4; j++) {
+            int tmp;
+            if(j>1) tmp=1;
+            else tmp=0;
+            if(table[i][j]>0){
+                AddNewObject(new Engine::Image("Seed/red.png", position_x[i][j%2], position_y[tmp], 0, 0, 0.5, 0.92));
+                AddNewObject(new Engine::Label(std::to_string(table[i][j]), "pirulen.ttf", 16, position_x[i][j%2], position_y[tmp]-14, 0, 0, 0, 255, 0.5, 0.5));
+            }
+            else AddNewObject(new Engine::Image("Seed/pink.png", position_x[i][j%2], position_y[tmp], 0, 0, 0.5, 0.92));
+        }
+    }
 }
 
 void SeedStoreScene::NextOnClick(int stage) {
@@ -144,13 +166,14 @@ void SeedStoreScene::BuyOnClick(int player, int money) {
     outfile.flush();
     outfile.close();
     Engine::GameEngine::GetInstance().ChangeScene("seed-store");
+    bgmId = AudioHelper::PlayAudio("money.wav");
 }
 
 int SeedStoreScene::GetSeedNumber(int player, int seed) {
     return table[player][seed];
 }
 
-int SeedStoreScene::CostMoney(int player, int seed){
+void SeedStoreScene::CostMoney(int player, int seed){
     std::cout<<"here"<<std::endl;
     table[player][seed]--;
     std::cout<<table[player][0]<<std::endl;

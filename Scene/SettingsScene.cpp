@@ -17,10 +17,10 @@ void SettingsScene::Initialize() {
     int halfH = h / 2;
 
     AddNewControlObject(UIGroup = new Group());
-    UIGroup->AddNewObject(new Engine::Image("our_game/background1.png", 0, 0, 1600, 800));
+    UIGroup->AddNewObject(new Engine::Image("our_game/background1.png", 0, 0, 1600, 900));
     // Yuli
     Engine::ImageButton *btn;
-    btn = new Engine::ImageButton("stage-select/dirt.png", "stage-select/floor.png", halfW - 200, halfH * 3 / 2 - 50,
+    btn = new Engine::ImageButton("stage-select/back.png", "stage-select/on.png", halfW - 200, halfH * 3 / 2 - 50,
                                   400, 100);
     btn->SetOnClickCallback(std::bind(&SettingsScene::PlayOnClick, this, 1));
     AddNewControlObject(btn);

@@ -3,10 +3,13 @@
 #include "Plant.hpp"
 
 class WheatPlant: public Plant {
-public:
-	static const int HarvestTime;
-    WheatPlant(float x, float y);
+protected:
+	static const int Price;
 
+public:
+    WheatPlant(float x, float y);
 	int Harvest();
+    //float harvestTimer;
+    static const float HarvestTime;
 };
 #endif // WHEATPLANT_HPP

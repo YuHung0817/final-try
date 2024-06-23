@@ -8,9 +8,19 @@
 #include "Scene/FarmScene.hpp"
 #include "Engine/Point.hpp"
 
-const int FlowerPlant::HarvestTime = 60; // 60 seconds
+#include <iostream>
+using namespace std;
+
+const int FlowerPlant::Price = 100;
+const float FlowerPlant::HarvestTime = 60.0; // seconds
 FlowerPlant::FlowerPlant(float x, float y) :
-	Plant("play/tower-base.png", "farm/flower.png", x, y, 200, 0.5, HarvestTime) {
+	Plant("play/tower-base.png", "farm/Seed4.png", x, y, Price, 0.0, HarvestTime, 0.0) {
 	// Move center downward, since we the turret head is slightly biased upward.
-	Anchor.y += 8.0f / GetBitmapHeight();
+	//Anchor.y += 8.0f / GetBitmapHeight();
 }
+int FlowerPlant::Harvest() {
+	return HarvestTime;
+}
+/*void FlowerPlant::HarvestTimerUpdate(int deltaTime) {
+	HarvestTimer += deltaTime;
+}*/

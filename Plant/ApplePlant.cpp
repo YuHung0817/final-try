@@ -8,10 +8,14 @@
 #include "Scene/FarmScene.hpp"
 #include "Engine/Point.hpp"
 
-const int ApplePlant::HarvestTime = 60; // 60 seconds
+const int ApplePlant::Price = 30;
+const float ApplePlant::HarvestTime = 40.0; // seconds
 ApplePlant::ApplePlant(float x, float y) :
-	Plant("play/tower-base.png", "farm/apple.png", x, y, 200, HarvestTime, 0.5) {
+	Plant("play/tower-base.png", "farm/Seed3.png", x, y, Price, 0, HarvestTime, 0.0) {
 	// Move center downward, since we the turret head is slightly biased upward.
-	Anchor.y += 8.0f / GetBitmapHeight();
+	//Anchor.y += 8.0f / GetBitmapHeight();
+}
+int ApplePlant::Harvest() {
+	return HarvestTime;
 }
 

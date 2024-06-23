@@ -27,28 +27,30 @@ void LoseScene::Initialize() {
    std::string img="";
     if(getGameScene()->winner==1) {
         tmp="player1 win";
-        img="our_game/doraemonwin.png";
+        img="reset/Player1Win.png";
     }
     else if(getGameScene()->winner==2) {
         tmp = "player2 win";
-        img="our_game/dashunwin.png";
+        img="reset/Player2Win.png";
     }
     else {
         tmp = "both die";
-        img="our_game/bothwin.png";
+        img="reset/BothDie.png";
     }
-    AddNewObject(new Engine::Image(img, halfW, halfH, 0, 0, 0.5, 0.5));
+    //AddNewControlObject(UIGroup = new Group());
+    //UIGroup->AddNewObject(new Engine::Image("our_game/background1.png", 0, 0, 1600, 800));
+    AddNewObject(new Engine::Image(img, 0, 0, 1600,900));
     //std::cout<<"player: "<<player<<std::endl;
     //std::string tmp="";
     //if(player=="both die") tmp="both die";
     //else  tmp=player+" Win";
-	AddNewObject(new Engine::Label(tmp, "pirulen.ttf", 48, halfW, halfH / 4 + 10, 255, 255, 255, 255, 0.5, 0.5));
+	AddNewObject(new Engine::Label(tmp, "pirulen.ttf", 48, halfW, halfH / 4 + 10, 0, 0, 0, 255, 0.5, 0.5));
 	Engine::ImageButton* btn;
-	btn = new Engine::ImageButton("win/dirt.png", "win/floor.png", halfW - 200, halfH * 7 / 4 - 50, 400, 100);
+	btn = new Engine::ImageButton("stage-select/back.png", "stage-select/on.png", halfW - 200, halfH * 7 / 4 - 50, 400, 100);
 	btn->SetOnClickCallback(std::bind(&LoseScene::BackOnClick, this, 2));
 	AddNewControlObject(btn);
 	AddNewObject(new Engine::Label("Back", "pirulen.ttf", 48, halfW, halfH * 7 / 4, 0, 0, 0, 255, 0.5, 0.5));
-    bgmInstance = AudioHelper::PlaySample("astronomia.ogg", false, AudioHelper::BGMVolume, PlayScene::DangerTime);
+    bgmInstance = AudioHelper::PlaySample("lose.wav", false, AudioHelper::BGMVolume, PlayScene::DangerTime);
 }
 void LoseScene::Terminate() {
 	AudioHelper::StopSample(bgmInstance);

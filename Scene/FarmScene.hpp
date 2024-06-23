@@ -19,13 +19,13 @@ namespace Engine {
 
 class FarmScene final : public Engine::IScene {
 private:
-	//ALLEGRO_SAMPLE_ID bgmId;
+	ALLEGRO_SAMPLE_ID bgmId;
 	//std::shared_ptr<ALLEGRO_SAMPLE_INSTANCE> deathBGMInstance;
 protected:
 	//int lives;
 	//int money;
 	//int SpeedMult;
-	
+	FarmScene* getFarmScene();
 public:
 	enum TileType {
 		TILE_DIRT,
@@ -42,23 +42,21 @@ public:
 	static const Engine::Point EndGridPoint;
 	int FieldId;
 	float ticks;
-	//float deathCountDown;
 	// Map tiles.
 	Group* TileFieldGroup;
 	Group* GroundEffectGroup;
 	Group* UIGroup;
 	Group* PlantGroup;
 	Group* EffectGroup;
-	//Engine::Label* UIMoney;
-	//Engine::Label* UILives;
+	Group* UpGroup;
+	Engine::Label* UIMoney;
 	Engine::Image* imgTarget;
-	//Engine::Sprite* dangerIndicator;
 	Plant* preview;
 	std::vector<std::vector<TileType>> fieldState;
 	std::vector<std::vector<int>> mapDistance;
 	std::vector<float> timeData;
 	std::vector<float> timer;
-	//std::list<int> keyStrokes;
+	std::vector<bool> tf;
 	static Engine::Point GetClientSize();
 	explicit FarmScene() = default;
 	void Initialize() override;
@@ -68,18 +66,17 @@ public:
 	void OnMouseDown(int button, int mx, int my) override;
 	void OnMouseMove(int mx, int my) override;
 	void OnMouseUp(int button, int mx, int my) override;
-	void Hit();
-	//int GetMoney() const;
 	void EarnMoney(int money);
+	int GetMoney();
 	void ReadTime();
 	void ReadField();
 	void ConstructUI();
 	void UIBtnClicked(int id);
 	bool CheckSpaceValid(int x, int y);
-	std::vector<std::vector<int>> CalculateBFSDistance();
-	// void ModifyReadMapTiles();
+	//std::vector<std::vector<int>> CalculateBFSDistance();
 	void BackOnClick();
 	void WritetoField();
 	void WritetoTime();
+	float getTimeData (int i, int j);
 };
 #endif // FARMSCENE_HPP

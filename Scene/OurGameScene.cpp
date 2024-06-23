@@ -102,10 +102,10 @@ void OurGameScene::Initialize() {
     UILive=NULL;
     UILive2=NULL;
     // Preload Lose Scene
-    deathBGMInstance = Engine::Resources::GetInstance().GetSampleInstance("astronomia.ogg");
+    deathBGMInstance = Engine::Resources::GetInstance().GetSampleInstance("lose.wav");
     Engine::Resources::GetInstance().GetBitmap("lose/benjamin-happy.png");
     // Start BGM.
-    bgmId = AudioHelper::PlayBGM("play.ogg");
+    bgmId = AudioHelper::PlayBGM("farming.wav");
 
     //add new role
     role1 = new Role1(1 * BlockSize, 1 * BlockSize);
@@ -123,6 +123,7 @@ void OurGameScene::Initialize() {
     if(role2->speedMult<=0) role2->speedMult=1;
 
 }
+
 void OurGameScene::SetRole1(){
     if(getPotionScene()->GetPotionNumber(1,1)>0){
         int T=getPotionScene()->GetPotionNumber(1,1);
@@ -604,13 +605,14 @@ void OurGameScene::CheckDie(int i,int j){
     int same2=0;
     if((role1->Position.x >= x_l  && role1->Position.x <= x_r )&& (role1->Position.y >= y_u && role1->Position.y <= y_d)){
         std::cout<<"live:"<<role1->live<<std::endl;
-        if(role1->live>1 && timer3<=0) {
+        if(role1->live>0 && timer3<=0) {
             timer3=5.0;
             UIGroup->AddNewObject(UILive = new Engine::Label( std::to_string(role2->live), "pirulen.ttf", 40, role1->Position.x, role1->Position.y));
             role1->live--;
             UILive->Text =   std::to_string(role1->live);
+            AudioHelper::PlayAudio("life.wav");
         }
-        else if(role1->live<=1){
+        else if(role1->live<1){
             winner=2;
             //Engine::GameEngine::GetInstance().ChangeScene("lose");
             same1=1;
@@ -618,14 +620,15 @@ void OurGameScene::CheckDie(int i,int j){
     }
     if((role2->Position.x >= x_l  && role2->Position.x <= x_r )&& (role2->Position.y >= y_u && role2->Position.y <= y_d)){
         std::cout<<"live:"<<role2->live<<std::endl;
-        if(role2->live>1 && timer4<=0) {
+        if(role2->live>0 && timer4<=0) {
             timer4=5.0;
             UIGroup->AddNewObject(UILive2 = new Engine::Label( std::to_string(role2->live), "pirulen.ttf", 40, role2->Position.x, role2->Position.y));
             role2->live--;
+            AudioHelper::PlayAudio("life.wav");
             UILive2->Text =   std::to_string(role2->live);
             //UIGroup->RemoveObject(UILive->GetObjectIterator());
         }
-        else if(role2->live<=1) {
+        else if(role2->live<1) {
             winner=1;
             //Engine::GameEngine::GetInstance().ChangeScene("lose");
             same2=1;
@@ -661,7 +664,8 @@ void OurGameScene::firearmEffect(int x,int y,Role* r){
         //up
         i_d=-1; j_d=0;
     }
-
+    i+=i_d;
+    j+=j_d;
     while(T--){
         i+=i_d;
         j+=j_d;

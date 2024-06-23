@@ -4,6 +4,8 @@
 
 #ifndef POTIONSTORESCENE_H
 #define POTIONSTORESCENE_H
+#include <allegro5/allegro_audio.h>
+
 #include "Engine/IScene.hpp"
 
 class Plant;
@@ -15,6 +17,8 @@ namespace Engine {
 }  // namespace Engine
 
 class PotionStoreScene final : public Engine::IScene {
+private:
+    ALLEGRO_SAMPLE_ID bgmId;
 protected:
     int money1, money2;
     int table[3][5]={0};
@@ -22,6 +26,7 @@ protected:
 public:
     void Initialize() override;
     void NextOnClick(int stage);
+    void BackOnClick(int stage);
     void BuyOnClick(int player, int money, int potion);
     //void OnMouseDown(int button, int mx, int my) override;
     //void OnMouseUp(int button, int mx, int my) override;

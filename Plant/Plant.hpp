@@ -14,9 +14,8 @@ protected:
     float coolDown;
     float reload = 0;
     float rotateRadian = 2 * ALLEGRO_PI;
-
     int price;
-    float harvestTime;
+    std::string plantName;
     Sprite imgBase;
     FarmScene* getFarmScene();
 
@@ -24,12 +23,14 @@ public:
     int state;
     bool Enabled = true;
     bool Preview = false;
-    Plant(std::string imgBase, std::string imgPlant, float x, float y, int price, float coolDown, float harvestTime);
+    Plant(std::string imgBase, std::string imgPlant, float x, float y, int price, float coolDown, float harvestTime, float harvestTimer);
     void Update(float deltaTime) override;
     void Draw() const override;
     int getPrice();
     float harvestTimer;
-    bool harvest;
+    float harvestTime;
+    //int can
+    bool harvest = false;
     void Harvest();
 };
 #endif // PLANT_HPP

@@ -10,8 +10,8 @@
 
 const int SicklePlant::HarvestTime = -1; // 60 seconds
 SicklePlant::SicklePlant(float x, float y) :
-	Plant("play/tower-base.png", "farm/sickle.png", x, y, 200, HarvestTime, 0.5) {
+	Plant("play/tower-base.png", "farm/sickle.png", x, y, 200, HarvestTime, 0.5, -1.0) {
 	// Move center downward, since we the turret head is slightly biased upward.
-	Anchor.y += 8.0f / GetBitmapHeight();
+	//Anchor.y += 8.0f / GetBitmapHeight();
 }
 

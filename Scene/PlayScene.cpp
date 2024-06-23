@@ -78,7 +78,7 @@ void PlayScene::Initialize() {
 	deathBGMInstance = Engine::Resources::GetInstance().GetSampleInstance("astronomia.ogg");
 	Engine::Resources::GetInstance().GetBitmap("lose/benjamin-happy.png");
 	// Start BGM.
-	bgmId = AudioHelper::PlayBGM("play.ogg");
+	bgmId = AudioHelper::PlayBGM("farming.wav");
 	
 }
 void PlayScene::Terminate() {
@@ -115,7 +115,7 @@ void PlayScene::Update(float deltaTime) {
 					// Restart Death Count Down BGM.
 					AudioHelper::StopSample(deathBGMInstance);
 					if (SpeedMult != 0)
-						deathBGMInstance = AudioHelper::PlaySample("astronomia.ogg", false, AudioHelper::BGMVolume, pos);
+						deathBGMInstance = AudioHelper::PlaySample("lose.wav", false, AudioHelper::BGMVolume, pos);
 				}
 				float alpha = pos / DangerTime;
 				alpha = std::max(0, std::min(255, static_cast<int>(alpha * alpha * 255)));

@@ -96,4 +96,5 @@ void Role::gettool(std::string type){
         bombRange*=2;
     }
     else tool.push(type);
+    AudioHelper::PlayAudio("pick.wav");
 }

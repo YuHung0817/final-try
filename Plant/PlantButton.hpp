@@ -6,15 +6,18 @@
 #include "Engine/Sprite.hpp"
 
 class FarmScene;
+class SeedStoreScene;
 
 class PlantButton : public Engine::ImageButton {
 protected:
     FarmScene* getFarmScene();
+	SeedStoreScene* getSeedScene();
+	
 public:
 	int seed;
 	Engine::Sprite Base;
 	Engine::Sprite Plant;
-	PlantButton(std::string img, std::string imgIn, Engine::Sprite Base, Engine::Sprite Plant, float x, float y, int seed);
+	PlantButton(std::string img, std::string imgIn, Engine::Sprite Base, Engine::Sprite Plant, float x, float y, int seedtype);
 	void Update(float deltaTime) override;
 	void Draw() const override;
 };
