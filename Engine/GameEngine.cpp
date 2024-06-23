@@ -10,7 +10,6 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
-#include <iostream>
 
 #include "Allegro5Exception.hpp"
 #include "GameEngine.hpp"
@@ -20,9 +19,7 @@
 #include "Resources.hpp"
 
 namespace Engine {
-    int GameEngine::Score=0;
-
-    void GameEngine::initAllegro5() {
+	void GameEngine::initAllegro5() {
 		if (!al_init()) throw Allegro5Exception("failed to initialize allegro");
 
 		// Initialize add-ons.
@@ -100,7 +97,6 @@ namespace Engine {
 			case ALLEGRO_EVENT_KEY_DOWN:
 				// Event for keyboard key down.
 				LOG(VERBOSE) << "Key with keycode " << event.keyboard.keycode << " down";
-                std::cout<<activeScene<<std::endl;
 				activeScene->OnKeyDown(event.keyboard.keycode);
 				break;
 			case ALLEGRO_EVENT_KEY_UP:
@@ -195,6 +191,8 @@ namespace Engine {
 			Resources::GetInstance().ReleaseUnused();
 		// Initialize the new scene.
 		activeScene->Initialize();
+		// Yu
+		//std::cout << name << "!" << std::endl;
 		LOG(INFO) << "Changed to " << name << " scene";
 	}
 	void GameEngine::Start(const std::string& firstSceneName, int fps, int screenW, int screenH,
@@ -233,7 +231,7 @@ namespace Engine {
 	void GameEngine::AddNewScene(const std::string& name, IScene* scene) {
 		if (scenes.count(name) != 0)
 			throw std::invalid_argument("Cannot add scenes with the same name.");
-        scenes[name]=scene;
+		scenes[name] = scene;
 	}
 	void GameEngine::ChangeScene(const std::string& name) {
 		nextScene = name;
@@ -270,13 +268,4 @@ namespace Engine {
 		static GameEngine instance;
 		return instance;
 	}
-    bool GameEngine::ProcessEvent(ALLEGRO_EVENT* event) {
-        return al_get_next_event(event_queue, event);
-    }
-    int GameEngine::getScore() {
-        return Score;
-    }
-    void GameEngine::SetScore(int x) {
-        Score=x;
-    }
 }

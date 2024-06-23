@@ -30,7 +30,6 @@ protected:
 	int lives;
 	int money;
 	int SpeedMult;
-    int score;
 public:
 	static bool DebugMode;
 	static const std::vector<Engine::Point> directions;
@@ -40,7 +39,7 @@ public:
 	static const Engine::Point SpawnGridPoint;
 	static const Engine::Point EndGridPoint;
 	static const std::vector<int> code;
-	int MapId=1;
+	int MapId;
 	float ticks;
 	float deathCountDown;
 	// Map tiles.
@@ -50,10 +49,10 @@ public:
 	Group* BulletGroup;
 	Group* TowerGroup;
 	Group* EnemyGroup;
+	Group* PlantGroup;
 	Group* EffectGroup;
 	Group* UIGroup;
 	Engine::Label* UIMoney;
-    Engine::Label* UIScore;
 	Engine::Label* UILives;
 	Engine::Image* imgTarget;
 	Engine::Sprite* dangerIndicator;
@@ -79,12 +78,8 @@ public:
 	void ReadEnemyWave();
 	void ConstructUI();
 	void UIBtnClicked(int id);
-    void ResurrectOnclick();
 	bool CheckSpaceValid(int x, int y);
 	std::vector<std::vector<int>> CalculateBFSDistance();
-    int GetScore();
-    int GetLives() const;
-    void EarnScore(int score);
 	// void ModifyReadMapTiles();
 };
 #endif // PLAYSCENE_HPP

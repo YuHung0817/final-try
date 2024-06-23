@@ -19,8 +19,6 @@ protected:
 	int money;
 	PlayScene* getPlayScene();
 	virtual void OnExplode();
-    //
-    int alpha;
 public:
 	float reachEndTime;
 	std::list<Turret*> lockedTurrets;
@@ -28,8 +26,7 @@ public:
 	Enemy(std::string img, float x, float y, float radius, float speed, float hp, int money);
  	void Hit(float damage);
 	void UpdatePath(const std::vector<std::vector<int>>& mapDistance);
-	virtual void Update(float deltaTime) override;
-	virtual void Draw() const override;
-    void SetAlpha(unsigned char alpha);  // 添加的方法
+	void Update(float deltaTime) override;
+	void Draw() const override;
 };
 #endif // ENEMY_HPP

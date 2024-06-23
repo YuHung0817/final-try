@@ -123,7 +123,7 @@ namespace Engine {
 		/// <param name="it">The iterator of the Control.</param>
 		void RemoveControl(std::list<std::pair<bool, IControl*>>::iterator it);
 		/// <summary>
-		/// Remove the ControlObject from this scene.
+		/// Remove the Con		trolObject from this scene.
 		/// </summary>
 		/// <param name="ctrlIt">The iterator of the Control.</param>
 		/// <param name="objIt">The iterator of the Object.</param>

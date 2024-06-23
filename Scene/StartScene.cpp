@@ -18,6 +18,8 @@
 #include "UI/Component/Slider.hpp"
 #include "Scene/StartScene.h"
 
+#include <iostream>
+
 void StartScene::Initialize() {
     int w = Engine::GameEngine::GetInstance().GetScreenSize().x;
     int h = Engine::GameEngine::GetInstance().GetScreenSize().y;
@@ -39,6 +41,7 @@ void StartScene::Initialize() {
 }
 void StartScene::Terminate() {
     IScene::Terminate();
+    //std::cout << "StartTerminate" << std::endl;
 }
 void StartScene::PlayOnClick(int stage) {
     Engine::GameEngine::GetInstance().ChangeScene("stage-select");

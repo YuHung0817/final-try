@@ -7,9 +7,9 @@
 
 class SettingsScene final : public Engine::IScene {
 private:
-
     std::shared_ptr<ALLEGRO_SAMPLE_INSTANCE> bgmInstance;
 public:
+    Group* UIGroup;
     explicit SettingsScene() = default;
 
     void Initialize() override;
@@ -21,7 +21,6 @@ public:
     void BGMSlideOnValueChanged(float value);
 
     void SFXSlideOnValueChanged(float value);
-
 };
 
 #endif // SettingsScene_HPP

@@ -38,6 +38,11 @@ void FireEffect::Update(float deltaTime) {
     //for remove
     Sprite::Update(deltaTime);
     OurGameScene* scene = getPlayScene();
+    if(timer<=2.5){
+        int i=Position.y/64;
+        int j=Position.x/64;
+        scene->CheckDie(i,j);
+    }
     if(timer<=0){
         //
         std::cout<<"time=0\n";

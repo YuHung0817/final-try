@@ -80,10 +80,7 @@ float Role::GetX() const {
 float Role::GetY() const {
     return this->Position.y;
 }
-void Role::gettool(std::string type){
-    std::cout<<"type== "<<type<<std::endl;
-    tool.push(type);
-}
+
 std::string Role::UseTool(){
     if(tool.empty()) return "";
     else {
@@ -92,4 +89,11 @@ std::string Role::UseTool(){
         tool.pop();
         return tmp;
     }
+}
+void Role::gettool(std::string type){
+    std::cout<<"type== "<<type<<std::endl;
+    if(type=="ToolBomb"){
+        bombRange*=2;
+    }
+    else tool.push(type);
 }

@@ -10,7 +10,7 @@
 #include "MissileBullet.hpp"
 #include "Scene/PlayScene.hpp"
 #include "Engine/Point.hpp"
-//Bullet3
+
 class Turret;
 
 MissileBullet::MissileBullet(Engine::Point position, Engine::Point forwardDirection, float rotation, Turret* parent) :

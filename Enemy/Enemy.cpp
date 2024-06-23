@@ -4,7 +4,6 @@
 #include <random>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "Engine/AudioHelper.hpp"
 #include "Bullet/Bullet.hpp"
@@ -47,12 +46,10 @@ void Enemy::Hit(float damage) {
 		for (auto& it: lockedBullets)
 			it->Target = nullptr;
 		getPlayScene()->EarnMoney(money);
-        getPlayScene()->EarnScore(money/10);
 		getPlayScene()->EnemyGroup->RemoveObject(objectIterator);
 		AudioHelper::PlayAudio("explosion.wav");
 	}
 }
-//mapstate
 void Enemy::UpdatePath(const std::vector<std::vector<int>>& mapDistance) {
 	int x = static_cast<int>(floor(Position.x / PlayScene::BlockSize));
 	int y = static_cast<int>(floor(Position.y / PlayScene::BlockSize));
@@ -63,7 +60,6 @@ void Enemy::UpdatePath(const std::vector<std::vector<int>>& mapDistance) {
 	Engine::Point pos(x, y);
 	int num = mapDistance[y][x];
 	if (num == -1) {
-        //std::cout<<" x, y, num= "<<x<<y<<num<<std::endl;
 		num = 0;
 		Engine::LOG(Engine::ERROR) << "Enemy path finding error";
 	}
@@ -126,7 +122,4 @@ void Enemy::Draw() const {
 		// Draw collision radius.
 		al_draw_circle(Position.x, Position.y, CollisionRadius, al_map_rgb(255, 0, 0), 2);
 	}
-}
-void Enemy::SetAlpha(unsigned char alpha) {
-    this->alpha = alpha;  // 假设 Sprite 类有一个 alpha 属性
 }

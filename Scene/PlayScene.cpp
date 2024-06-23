@@ -7,29 +7,16 @@
 #include <queue>
 #include <string>
 #include <memory>
-#include <iostream>
 
 #include "Engine/AudioHelper.hpp"
 #include "UI/Animation/DirtyEffect.hpp"
 #include "Enemy/Enemy.hpp"
-#include "Enemy/Enemy4.hpp"
-#include "Enemy/Enemy5.hpp"
-#include "Enemy/Enemy6.hpp"
-#include "Enemy/Enemy7.hpp"
-#include "Enemy/Enemy8.hpp"
-#include "Enemy/Enemy9.hpp"
-#include "Enemy/Enemy10.hpp"
-#include "Enemy/Enemy11.hpp"
 #include "Engine/GameEngine.hpp"
 #include "Engine/Group.hpp"
 #include "UI/Component/Label.hpp"
 #include "Turret/LaserTurret.hpp"
 #include "Turret/MachineGunTurret.hpp"
 #include "Turret/MissileTurret.hpp"
-#include "Turret/Turret4.hpp"
-#include "Turret/Turret5.hpp"
-#include "Turret/Turret6.hpp"
-#include "Turret/Turret7.hpp"
 #include "UI/Animation/Plane.hpp"
 #include "Enemy/PlaneEnemy.hpp"
 #include "PlayScene.hpp"
@@ -37,10 +24,12 @@
 #include "Enemy/SoldierEnemy.hpp"
 #include "Enemy/TankEnemy.hpp"
 #include "Turret/TurretButton.hpp"
-#include "tool/Resurrect.hpp"
-#include "tool/ResurrectButton.hpp"
-#include "Engine/IScene.hpp"
-#include "Engine/Point.hpp"
+// Yu start
+#include <iostream>
+using namespace std;
+#include "Turret/MyTurret.hpp"
+#include "Enemy/MyEnemy.hpp"
+// Yu end
 
 
 bool PlayScene::DebugMode = false;
@@ -66,7 +55,6 @@ void PlayScene::Initialize() {
 	deathCountDown = -1;
 	lives = 10;
 	money = 150;
-    score=0;
 	SpeedMult = 1;
 	// Add groups from bottom to top.
 	AddNewObject(TileMapGroup = new Group());
@@ -91,6 +79,7 @@ void PlayScene::Initialize() {
 	Engine::Resources::GetInstance().GetBitmap("lose/benjamin-happy.png");
 	// Start BGM.
 	bgmId = AudioHelper::PlayBGM("play.ogg");
+	
 }
 void PlayScene::Terminate() {
 	AudioHelper::StopBGM(bgmId);
@@ -99,6 +88,8 @@ void PlayScene::Terminate() {
 	IScene::Terminate();
 }
 void PlayScene::Update(float deltaTime) {
+	IScene::Update(deltaTime);
+	cout << "deltaTime: " << deltaTime << endl;
 	// If we use deltaTime directly, then we might have Bullet-through-paper problem.
 	// Reference: Bullet-Through-Paper
 	if (SpeedMult == 0)
@@ -159,9 +150,6 @@ void PlayScene::Update(float deltaTime) {
 				delete EffectGroup;
 				delete UIGroup;
 				delete imgTarget;*/
-                if( money!=0 ) this->EarnScore(money/10);
-                //std::cout<<"here\n\n\n";
-                Engine::GameEngine::SetScore(score);
 				Engine::GameEngine::GetInstance().ChangeScene("win");
 			}
 			continue;
@@ -183,30 +171,11 @@ void PlayScene::Update(float deltaTime) {
 		case 3:
 			EnemyGroup->AddNewObject(enemy = new TankEnemy(SpawnCoordinate.x, SpawnCoordinate.y));
 			break;
-        case 4:
-            EnemyGroup->AddNewObject(enemy = new Enemy4(SpawnCoordinate.x, SpawnCoordinate.y));
-            break;
-        case 5:
-            EnemyGroup->AddNewObject(enemy = new Enemy5(SpawnCoordinate.x, SpawnCoordinate.y));
-            break;
-        case 6:
-            EnemyGroup->AddNewObject(enemy = new Enemy6(SpawnCoordinate.x, SpawnCoordinate.y));
-            break;
-        case 7:
-            EnemyGroup->AddNewObject(enemy = new Enemy7(SpawnCoordinate.x, SpawnCoordinate.y));
-            break;
-        case 8:
-            EnemyGroup->AddNewObject(enemy = new Enemy8(SpawnCoordinate.x, SpawnCoordinate.y));
-            break;
-        case 9:
-            EnemyGroup->AddNewObject(enemy = new Enemy9(SpawnCoordinate.x, SpawnCoordinate.y));
-            break;
-        case 10:
-            EnemyGroup->AddNewObject(enemy = new Enemy10(SpawnCoordinate.x, SpawnCoordinate.y));
-            break;
-        case 11:
-            EnemyGroup->AddNewObject(enemy = new Enemy11(SpawnCoordinate.x, SpawnCoordinate.y));
-            break;
+		// Yuli
+		case 4:
+			EnemyGroup->AddNewObject(enemy = new MyEnemy(SpawnCoordinate.x, SpawnCoordinate.y));
+			break;
+		// Yuli
         // TODO: [CUSTOM-ENEMY]: You need to modify 'Resource/enemy1.txt', or 'Resource/enemy2.txt' to spawn the 4th enemy.
         //         The format is "[EnemyId] [TimeDelay] [Repeat]".
         // TODO: [CUSTOM-ENEMY]: Enable the creation of the enemy.
@@ -251,8 +220,6 @@ void PlayScene::OnMouseMove(int mx, int my) {
 	IScene::OnMouseMove(mx, my);
 	const int x = mx / BlockSize;
 	const int y = my / BlockSize;
-    //std::cout<<"BlockSize , MapWIdth ,MapHeight";
-
 	if (!preview || x < 0 || x >= MapWidth || y < 0 || y >= MapHeight) {
 		imgTarget->Visible = false;
 		return;
@@ -261,7 +228,6 @@ void PlayScene::OnMouseMove(int mx, int my) {
 	imgTarget->Position.x = x * BlockSize;
 	imgTarget->Position.y = y * BlockSize;
 }
-
 void PlayScene::OnMouseUp(int button, int mx, int my) {
 	IScene::OnMouseUp(button, mx, my);
 	if (!imgTarget->Visible)
@@ -276,7 +242,7 @@ void PlayScene::OnMouseUp(int button, int mx, int my) {
 			if (!CheckSpaceValid(x, y)) {
 				Engine::Sprite* sprite;
 				GroundEffectGroup->AddNewObject(sprite = new DirtyEffect("play/target-invalid.png", 1, x * BlockSize + BlockSize / 2, y * BlockSize + BlockSize / 2));
-				sprite->Rotation = 0;
+				//sprite->Rotation = 0;
 				return;
 			}
 			// Purchase.
@@ -287,8 +253,6 @@ void PlayScene::OnMouseUp(int button, int mx, int my) {
 			// Construct real turret.
 			preview->Position.x = x * BlockSize + BlockSize / 2;
 			preview->Position.y = y * BlockSize + BlockSize / 2;
-            //std::cout<<"X,Y:";
-            std::cout<<"X: "<<x<<"Y: "<<y<<std::endl;
 			preview->Enabled = true;
 			preview->Preview = false;
 			preview->Tint = al_map_rgba(255, 255, 255, 255);
@@ -314,15 +278,17 @@ void PlayScene::OnKeyDown(int keyCode) {
 			keyStrokes.pop_front();
 		if (keyCode == ALLEGRO_KEY_ENTER && keyStrokes.size() == code.size()) {
 			auto it = keyStrokes.begin();
-			for (int c : code){
+			for (int c : code) {
 				if (!((*it == c) ||
 					(c == ALLEGRO_KEYMOD_SHIFT &&
 					(*it == ALLEGRO_KEY_LSHIFT || *it == ALLEGRO_KEY_RSHIFT))))
 					return;
 				++it;
 			}
+			//Yuli for debug std::cout << "yu" << std::endl;
 			EffectGroup->AddNewObject(new Plane());
-            this->EarnMoney(10000);
+			EarnMoney(10000);
+			// Yuli
 		}
 	}
 	if (keyCode == ALLEGRO_KEY_Q) {
@@ -338,6 +304,12 @@ void PlayScene::OnKeyDown(int keyCode) {
 		UIBtnClicked(2);
 	}
 	// TODO: [CUSTOM-TURRET]: Make specific key to create the turret.
+	// Yu start
+	else if (keyCode == ALLEGRO_KEY_R) {
+		// Hotkey for MyTurret.
+		UIBtnClicked(3);
+	}
+	// Yu end
 	else if (keyCode >= ALLEGRO_KEY_0 && keyCode <= ALLEGRO_KEY_9) {
 		// Hotkey for Speed up.
 		SpeedMult = keyCode - ALLEGRO_KEY_0;
@@ -347,27 +319,17 @@ void PlayScene::Hit() {
 	lives--;
 	UILives->Text = std::string("Life ") + std::to_string(lives);
 	if (lives <= 0) {
-    //Engine::GameEngine::GetInstance().ChangeScene("lose-scene");
-    //debug
-    Engine::GameEngine::GetInstance().ChangeScene("lose");
+		// Yuli
+		Engine::GameEngine::GetInstance().ChangeScene("lose");
+		// Yuli
 	}
 }
 int PlayScene::GetMoney() const {
 	return money;
 }
-int PlayScene::GetScore() {
-    return score;
-}
-int PlayScene::GetLives() const{
-    return lives;
-}
 void PlayScene::EarnMoney(int money) {
 	this->money += money;
 	UIMoney->Text = std::string("$") + std::to_string(this->money);
-}
-void PlayScene::EarnScore(int score){
-    this->score += score;
-    UIScore->Text = std::string("score ") + std::to_string(this->score);
 }
 void PlayScene::ReadMap() {
 	std::string filename = std::string("Resource/map") + std::to_string(MapId) + ".txt";
@@ -396,36 +358,29 @@ void PlayScene::ReadMap() {
 	for (int i = 0; i < MapHeight; i++) {
 		for (int j = 0; j < MapWidth; j++) {
 			const int num = mapData[i * MapWidth + j];
-            //enum TILE_DIRT, //0
-            //		TILE_FLOOR, //1
-            //		TILE_OCCUPIED, //2
-            //if num is 0 ->TILE_DIRT=0 else if num=1 ->TILE_FLOOR=1
 			mapState[i][j] = num ? TILE_FLOOR : TILE_DIRT;
 			if (num)
-                //num=1 -> enemy can't walk
 				TileMapGroup->AddNewObject(new Engine::Image("play/floor.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
 			else
-                //num=0 -> enemy can walk
 				TileMapGroup->AddNewObject(new Engine::Image("play/dirt.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
 		}
 	}
 }
 void PlayScene::ReadEnemyWave() {
-    // TODO: [HACKATHON-3-BUG] (3/5): Trace the code to know how the enemies are created.//5
+    // TODO: [HACKATHON-3-BUG] (3/5): Trace the code to know how the enemies are created.
     // TODO: [HACKATHON-3-BUG] (3/5): There is a bug in these files, which let the game only spawn the first enemy, try to fix it.
     std::string filename = std::string("Resource/enemy") + std::to_string(MapId) + ".txt";
 	// Read enemy file.
 	float type, wait, repeat;
-    char tmp;
 	enemyWaveData.clear();
 	std::ifstream fin(filename);
-
 	while (fin >> type && fin >> wait && fin >> repeat) {
-        for (int i = 0; i < repeat; i++)
-            enemyWaveData.emplace_back(type, wait);
+		for (int i = 0; i < repeat; i++)
+			enemyWaveData.emplace_back(type, wait);
 	}
 	fin.close();
 }
+
 void PlayScene::ConstructUI() {
 	// Background
 	UIGroup->AddNewObject(new Engine::Image("play/sand.png", 1280, 0, 320, 832));
@@ -433,73 +388,39 @@ void PlayScene::ConstructUI() {
 	UIGroup->AddNewObject(new Engine::Label(std::string("Stage ") + std::to_string(MapId), "pirulen.ttf", 32, 1294, 0));
 	UIGroup->AddNewObject(UIMoney = new Engine::Label(std::string("$") + std::to_string(money), "pirulen.ttf", 24, 1294, 48));
 	UIGroup->AddNewObject(UILives = new Engine::Label(std::string("Life ") + std::to_string(lives), "pirulen.ttf", 24, 1294, 88));
-    UIGroup->AddNewObject(UIScore = new Engine::Label(std::string("Score ") + std::to_string(score), "pirulen.ttf", 24, 1294, 128));
 	TurretButton* btn;
-
 	// Button 1
 	btn = new TurretButton("play/floor.png", "play/dirt.png",
-		Engine::Sprite("play/tower-base.png", 1294, 136+40, 0, 0, 0, 0),
-		Engine::Sprite("play/turret-1.png", 1294, 136 - 8+40, 0, 0, 0, 0)
-		, 1294, 136+40, MachineGunTurret::Price);
+		Engine::Sprite("play/tower-base.png", 1294, 136, 0, 0, 0, 0),
+		Engine::Sprite("play/turret-1.png", 1294, 136 - 8, 0, 0, 0, 0)
+		, 1294, 136, MachineGunTurret::Price);
 	// Reference: Class Member Function Pointer and std::bind.
 	btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 0));
 	UIGroup->AddNewControlObject(btn);
 	// Button 2
 	btn = new TurretButton("play/floor.png", "play/dirt.png",
-		Engine::Sprite("play/tower-base.png", 1370, 136+40, 0, 0, 0, 0),
-		Engine::Sprite("play/turret-2.png", 1370, 136 - 8+40, 0, 0, 0, 0)
-		, 1370, 136+40, LaserTurret::Price);
+		Engine::Sprite("play/tower-base.png", 1370, 136, 0, 0, 0, 0),
+		Engine::Sprite("play/turret-2.png", 1370, 136 - 8, 0, 0, 0, 0)
+		, 1370, 136, LaserTurret::Price);
 	btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 1));
 	UIGroup->AddNewControlObject(btn);
 	// Button 3
 	btn = new TurretButton("play/floor.png", "play/dirt.png",
-		Engine::Sprite("play/tower-base.png", 1446, 136+40, 0, 0, 0, 0),
-		Engine::Sprite("play/turret-3.png", 1446, 136+40, 0, 0, 0, 0)
-		, 1446, 136+40, MissileTurret::Price);
+		Engine::Sprite("play/tower-base.png", 1446, 136, 0, 0, 0, 0),
+		Engine::Sprite("play/turret-3.png", 1446, 136, 0, 0, 0, 0)
+		, 1446, 136, MissileTurret::Price);
 	btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 2));
 	UIGroup->AddNewControlObject(btn);
 	// TODO: [CUSTOM-TURRET]: Create a button to support constructing the turret.
-    //button 4
-    btn = new TurretButton("play/floor.png", "play/dirt.png",
-       Engine::Sprite("play/tower-base.png", 1522, 136+40, 0, 0, 0, 0),
-       Engine::Sprite("play/turret-4.png", 1522, 136+40, 0, 0, 0, 0)
-        , 1522, 136+40, Turret4::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 3));
-    UIGroup->AddNewControlObject(btn);
-    //button 5
-    btn = new TurretButton("play/floor.png", "play/dirt.png",
-       Engine::Sprite("play/tower-base.png", 1294, 212+40, 0, 0, 0, 0),
-       Engine::Sprite("play/turret-5.png", 1294, 212+40, 0, 0, 0, 0)
-        , 1294, 212+40, Turret5::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));
-    UIGroup->AddNewControlObject(btn);
-    //button 6
-    btn = new TurretButton("play/floor.png", "play/dirt.png",
-       Engine::Sprite("play/tower-base.png", 1370, 212+40, 0, 0, 0, 0),
-       Engine::Sprite("play/turret-6.png", 1370, 212+40, 0, 0, 0, 0)
-        , 1370, 212+40, Turret6::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5));
-    UIGroup->AddNewControlObject(btn);
-    //button 7
-    btn = new TurretButton("play/floor.png", "play/dirt.png",
-       Engine::Sprite("play/tower-base.png", 1446, 212+40, 0, 0, 0, 0),
-       Engine::Sprite("play/turret-7.png", 1446, 212+40, 0, 0, 0, 0)
-        , 1446, 212+40, Turret7::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 6));
-    UIGroup->AddNewControlObject(btn);
-
-    ResurrectButton* btn2;
-    //button 8 for tool to resurrect
-    btn2 = new ResurrectButton("play/floor.png", "play/dirt.png",
-                               Engine::Sprite("play/tower-base.png", 1294+130, 68, 0, 0, 0, 0),
-                               Engine::Sprite("play/resurrect.png", 1294+130, 68, 0, 0, 0, 0)
-            , 1294+130, 68, Resurrect::Price);
-    btn2->SetOnClickCallback(std::bind(&PlayScene::ResurrectOnclick, this));
-    UIGroup->AddNewControlObject(btn2);
-
-
-
-
+	// Yu start
+	// Button 4
+	btn = new TurretButton("play/floor.png", "play/dirt.png",
+		Engine::Sprite("play/tower-base.png", 1522, 136, 0, 0, 0, 0),
+		Engine::Sprite("play/MyTurret.png", 1522, 136, 0, 0, 0, 0)
+		, 1522, 136, MyTurret::Price);
+	btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 3));
+	UIGroup->AddNewControlObject(btn);
+	// Yu end
 	int w = Engine::GameEngine::GetInstance().GetScreenSize().x;
 	int h = Engine::GameEngine::GetInstance().GetScreenSize().y;
 	int shift = 135 + 25;
@@ -507,13 +428,7 @@ void PlayScene::ConstructUI() {
 	dangerIndicator->Tint.a = 0;
 	UIGroup->AddNewObject(dangerIndicator);
 }
-void PlayScene::ResurrectOnclick(){
-    if(this->lives<=3 && this->money >= Resurrect::Price){
-        this->money-=Resurrect::Price;
-        this->lives=10;
-        UILives->Text = std::string("Life ") + std::to_string(lives);
-    }
-}
+
 void PlayScene::UIBtnClicked(int id) {
 	if (preview)
 		UIGroup->RemoveObject(preview->GetObjectIterator());
@@ -524,14 +439,10 @@ void PlayScene::UIBtnClicked(int id) {
 		preview = new LaserTurret(0, 0);
 	else if (id == 2 && money >= MissileTurret::Price)
 		preview = new MissileTurret(0, 0);
-    else if (id == 3 && money >= Turret4::Price)
-        preview = new Turret4(0,0);
-    else if (id == 4 && money >= Turret5::Price)
-        preview = new Turret5(0,0);
-    else if( id == 5 && money >= Turret6::Price)
-        preview = new Turret6(0,0);
-    else if (id ==6 && money >= Turret7::Price)
-        preview = new Turret7(0,0);
+	// Yu start
+	else if (id == 3 && money >= MyTurret::Price)
+		preview = new MyTurret(0, 0);
+	// Yu end
 	if (!preview)
 		return;
 	preview->Position = Engine::GameEngine::GetInstance().GetMousePosition();
@@ -572,32 +483,30 @@ bool PlayScene::CheckSpaceValid(int x, int y) {
 std::vector<std::vector<int>> PlayScene::CalculateBFSDistance() {
 	// Reverse BFS to find path.
 	std::vector<std::vector<int>> map(MapHeight, std::vector<int>(std::vector<int>(MapWidth, -1)));
+	int visited[MapHeight][MapWidth] = {0};
+	visited[MapHeight - 1][MapWidth - 1] = 1;
 	std::queue<Engine::Point> que;
 	// Push end point.
 	// BFS from end point.
 	if (mapState[MapHeight - 1][MapWidth - 1] != TILE_DIRT)
-        return map;
-
-
+		return map;
 	que.push(Engine::Point(MapWidth - 1, MapHeight - 1));
 	map[MapHeight - 1][MapWidth - 1] = 0;
 	while (!que.empty()) {
-        //get the first element,but not remove it
 		Engine::Point p = que.front();
-        //remove it
 		que.pop();
 		// TODO: [BFS PathFinding] (1/1): Implement a BFS starting from the most right-bottom block in the map.
 		//               For each step you should assign the corresponding distance to the most right-bottom block.
 		//               mapState[y][x] is TILE_DIRT if it is empty.
-        //four direction: up down right left
-        for (auto& dir : PlayScene::directions) {
-            int x = p.x + dir.x;
-            int y = p.y + dir.y;
-            if (x >= 0 && x < MapWidth && y >= 0 && y < MapHeight && mapState[y][x] == TILE_DIRT && map[y][x] == -1) {
-                map[y][x] = map[p.y][p.x] + 1;
-                que.push(Engine::Point(x, y));
-            }
-        }
+		for(int i = 0; i < 4; i++) {
+			int x = (p + directions[i]).x;
+			int y = (p + directions[i]).y;
+			if (x >= 0 && x < MapWidth && y >= 0 && y < MapHeight && !visited[y][x] && mapState[y][x] == TILE_DIRT) {
+				visited[y][x] = 1;
+				map[y][x] = map[p.y][p.x] + 1;
+				que.push(Engine::Point(x, y));
+			}
+		}
 	}
 	return map;
 }

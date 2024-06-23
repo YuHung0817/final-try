@@ -27,7 +27,15 @@ bool Role2::change=false;
 Role2::Role2(int x, int y) : Role("our_game/role2.png", x, y, 10, 50, 30, 30) {}
 
 
-
+void Role2::init(){
+    dir=0;
+    live=1;
+    speedMult=1;
+    offset=0;
+    frameIndex=0;
+    change=false;
+    bombRange=1;
+}
 void Role2::Draw() const{
     if(change) {
         //std::cout << "FrameIndex: " << frameIndex << std::endl;

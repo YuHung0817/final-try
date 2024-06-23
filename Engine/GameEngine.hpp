@@ -16,7 +16,6 @@ namespace Engine {
 	/// </summary>
 	class GameEngine final {
 	private:
-        static int Score;
 		// Allegro5 settings, frames per second, screen width, screen height, maximum simultaneous audio samples.
 		int fps{}, screenW{}, screenH{}, reserveSamples{};
 		// Determines whether to free memory between scenes.
@@ -77,9 +76,6 @@ namespace Engine {
 		/// <param name="name">The name of the scene you want to change to.</param>
 		void changeScene(const std::string& name);
 	public:
-
-        static int getScore();
-        static void SetScore(int x);
 		// Note: We'll ignore C++11's move constructor, move assignment operator in this project for simplicity.
 		/// <summary>
 		/// Copy constructor is deleted, no copying allowed.
@@ -158,7 +154,6 @@ namespace Engine {
 		/// </summary>
 		/// <returns>The Singleton instance of GameEngine.</returns>
 		static GameEngine& GetInstance();
-        bool ProcessEvent(ALLEGRO_EVENT* event);
 	};
 }
 #endif // GAMEENGINE_HPP

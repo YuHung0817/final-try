@@ -8,7 +8,7 @@
 #include "LaserBullet.hpp"
 #include "Scene/PlayScene.hpp"
 #include "Engine/Point.hpp"
-//Bullet2
+
 class Turret;
 
 LaserBullet::LaserBullet(Engine::Point position, Engine::Point forwardDirection, float rotation, Turret* parent) :

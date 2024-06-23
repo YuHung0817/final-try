@@ -3,9 +3,11 @@
 #include <allegro5/allegro_audio.h>
 #include <memory>
 #include "Engine/IScene.hpp"
+#include "OurGameScene.hpp"
 
 class LoseScene final : public Engine::IScene {
 private:
+    //OurGameScene* getGameScene();
 	std::shared_ptr<ALLEGRO_SAMPLE_INSTANCE> bgmInstance;
 public:
 	explicit LoseScene() = default;

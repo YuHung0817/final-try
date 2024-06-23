@@ -1,9 +1,6 @@
-//
-// Created by IRIS0817 on 2024/6/11.
-//
-#include <random>
 #include <allegro5/allegro.h>
 #include <algorithm>
+#include <random>
 #include <cmath>
 #include <fstream>
 #include <functional>
@@ -25,16 +22,11 @@
 #include "Turret/LaserTurret.hpp"
 #include "Turret/MachineGunTurret.hpp"
 #include "Turret/MissileTurret.hpp"
-#include "Turret/Turret4.hpp"
-#include "Turret/Turret5.hpp"
-#include "Turret/Turret6.hpp"
-#include "Turret/Turret7.hpp"
 #include "UI/Animation/Plane.hpp"
 #include "Scene/OurGameScene.hpp"
+#include "Scene/PotionStoreScene.h"
 #include "Engine/Resources.hpp"
 #include "Turret/TurretButton.hpp"
-#include "tool/Resurrect.hpp"
-#include "tool/ResurrectButton.hpp"
 #include "Engine/IScene.hpp"
 #include "Engine/Point.hpp"
 #include "Bomb/Bomb.hpp"
@@ -49,7 +41,11 @@
 #include "Instrument/Hammer.hpp"
 #include "Instrument/ToolBomb.hpp"
 
-float OurGameScene::timer=0;
+int OurGameScene::winner=0;
+float OurGameScene::timer1=0;
+float OurGameScene::timer2=0;
+float OurGameScene::timer3=0;
+float OurGameScene::timer4=0;
 Box* OurGameScene::mapBox[25][13];
 Firearm* OurGameScene::mapFirearm[25][13];
 Bubble* OurGameScene::mapBubble[25][13];
@@ -67,6 +63,11 @@ const std::vector<int> OurGameScene::code = { ALLEGRO_KEY_UP, ALLEGRO_KEY_UP, AL
 Engine::Point OurGameScene::GetClientSize() {
     return Engine::Point(MapWidth * BlockSize, MapHeight * BlockSize);
 }
+
+PotionStoreScene* getPotionScene() {
+    return dynamic_cast<PotionStoreScene*>(Engine::GameEngine::GetInstance().GetScene("potion-store"));
+}
+
 void OurGameScene::Initialize() {
     std::cout<<"to ourgame initialize\n";
     // TODO: [HACKATHON-3-BUG] (1/5): There's a bug in this file, which crashes the game when you lose. Try to find it.
@@ -76,7 +77,7 @@ void OurGameScene::Initialize() {
     keyStrokes.clear();
     ticks = 0;
     deathCountDown = -1;
-    SpeedMult = 1;
+    //SpeedMult = 1;
     // Add groups from bottom to top.
     AddNewObject(TileMapGroup = new Group());
     AddNewObject(GroundEffectGroup = new Group());
@@ -98,6 +99,8 @@ void OurGameScene::Initialize() {
     imgTarget = new Engine::Image("play/target.png", 0, 0);
     imgTarget->Visible = false;
     UIGroup->AddNewObject(imgTarget);
+    UILive=NULL;
+    UILive2=NULL;
     // Preload Lose Scene
     deathBGMInstance = Engine::Resources::GetInstance().GetSampleInstance("astronomia.ogg");
     Engine::Resources::GetInstance().GetBitmap("lose/benjamin-happy.png");
@@ -110,6 +113,55 @@ void OurGameScene::Initialize() {
     //add new role
     role2 = new Role2(23 * BlockSize, 11 * BlockSize);
     RoleGroup->AddNewObject(role2);
+
+    role1->init();
+    role2->init();
+    SetRole1();
+    SetRole2();
+
+    if(role1->speedMult<=0) role1->speedMult=1;
+    if(role2->speedMult<=0) role2->speedMult=1;
+
+}
+void OurGameScene::SetRole1(){
+    if(getPotionScene()->GetPotionNumber(1,1)>0){
+        int T=getPotionScene()->GetPotionNumber(1,1);
+        while(T--){
+            role1->speedMult*=2;
+        }
+    }
+    if(getPotionScene()->GetPotionNumber(1,0)>0){
+        int T=getPotionScene()->GetPotionNumber(1,0);
+        while(T--){
+            role1->live+=1;
+        }
+    }
+    if(getPotionScene()->GetPotionNumber(1,2)>0){
+        int T=getPotionScene()->GetPotionNumber(1,2);
+        while(T--){
+            role2->speedMult-=1;
+        }
+    }
+}
+void OurGameScene::SetRole2(){
+    if(getPotionScene()->GetPotionNumber(2,1)>0){
+        int T=getPotionScene()->GetPotionNumber(2,1);
+        while(T--){
+            role2->speedMult*=2;
+        }
+    }
+    if(getPotionScene()->GetPotionNumber(2,0)>0){
+        int T=getPotionScene()->GetPotionNumber(2,0);
+        while(T--){
+            role2->live+=1;
+        }
+    }
+    if(getPotionScene()->GetPotionNumber(2,2)>0){
+        int T=getPotionScene()->GetPotionNumber(2,2);
+        while(T--){
+            role1->speedMult-=1;
+        }
+    }
 }
 void OurGameScene::Terminate() {
     AudioHelper::StopBGM(bgmId);
@@ -137,14 +189,27 @@ void OurGameScene::Draw() const {
 }
 
 void OurGameScene::Update(float deltaTime) {
+    timer3-=deltaTime;
+    timer4-=deltaTime;
+    if(timer3<=3.0 && UILive!=NULL){
+        UIGroup->RemoveObject(UILive->GetObjectIterator());
+        UILive=NULL;
+    }
+    if(timer4<=3.0 && UILive2!=NULL){
+        UIGroup->RemoveObject(UILive2->GetObjectIterator());
+        UILive2=NULL;
+    }
+
+    //std::cout<<"timer3: "<<timer3<<" timer4: "<<timer4<<std::endl;
     IScene::Update(deltaTime);
 
     // Update roles
     role1->Update(deltaTime);
     role2->Update(deltaTime);
-    timer+=deltaTime*SpeedMult;
+    timer1+=deltaTime*(role1->speedMult);
+    timer2+=deltaTime*(role2->speedMult);
     // Continuous key handling for role1
-    if(timer>=0.3) {
+    if(timer1>=0.3) {
         if (keys[ALLEGRO_KEY_UP]) {
             int newX = role1->Position.x;
             int newY = role1->Position.y - BlockSize/4;
@@ -185,7 +250,9 @@ void OurGameScene::Update(float deltaTime) {
                 TakeTool(role1);
             }
         }
-
+        timer1=0;
+    }
+    if(timer2>=0.3){
         // Continuous key handling for role2
         if (keys[ALLEGRO_KEY_W]) {
             int newX = role2->Position.x;
@@ -227,8 +294,9 @@ void OurGameScene::Update(float deltaTime) {
                 TakeTool(role2);
             }
         }
-        timer=0;
+        timer2=0;
     }
+
 }
 void OurGameScene::OnKeyDown(int keyCode) {
     keys[keyCode] = true;
@@ -245,12 +313,9 @@ void OurGameScene::OnKeyDown(int keyCode) {
         //no other on the hand ,put bomb
         //or put the first get tool
         std::string tmp=role1->UseTool();
-        if(tmp=="") PutBomb(role1->Position.x,role1->Position.y);
+        if(tmp=="") PutBomb(role1->Position.x,role1->Position.y,role1);
         else if(tmp=="Firearm"){
-            std::cout<<"to functino\n";
             firearmEffect(role1->Position.x,role1->Position.y,role1);
-        }else if(tmp=="ToolBomb"){
-
         }else if(tmp=="Hammer"){
             hammerEffect(role1->Position.x,role1->Position.y,role1);
         }
@@ -258,11 +323,9 @@ void OurGameScene::OnKeyDown(int keyCode) {
     if(keyCode ==ALLEGRO_KEY_SPACE){
 
         std::string tmp=role2->UseTool();
-        if(tmp=="") PutBomb(role2->Position.x,role2->Position.y);
+        if(tmp=="") PutBomb(role2->Position.x,role2->Position.y,role2);
         else if(tmp=="Firearm"){
             firearmEffect(role2->Position.x,role2->Position.y,role2);
-        }else if(tmp=="ToolBomb"){
-
         }else if(tmp=="Hammer"){
             hammerEffect(role2->Position.x,role2->Position.y,role2);
         }
@@ -359,18 +422,18 @@ void OurGameScene::ReadMap() {
 
 
 
-            TileMapGroup->AddNewObject(new Engine::Image("our_game/floor3.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
+            TileMapGroup->AddNewObject(new Engine::Image("our_game/floor7.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
             if(num==0){
                // TileMapGroup->AddNewObject(new Engine::Image("our_game/snow.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
             }else if(num==1) {
                 //wall
-                /*std::random_device rd;
+                std::random_device rd;
                 std::mt19937 gen(rd());
-                std::uniform_int_distribution<> dis(1, 4);
+                std::uniform_int_distribution<> dis(1, 8);
                 int random_number = dis(gen);
                 std::string random_number_str = std::to_string(random_number);
-                std::string home_wall="our_game/tree"+random_number_str+".png";*/
-                TileMapGroup->AddNewObject(new Engine::Image("our_game/snowman.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
+                std::string flower_wall="our_game/flower"+random_number_str+".png";
+                TileMapGroup->AddNewObject(new Engine::Image(flower_wall, j * BlockSize, i * BlockSize, BlockSize, BlockSize));
             }else if(num==2){
                 //TileMapGroup->AddNewObject(new Engine::Image("our_game/dirt.png", j * BlockSize, i * BlockSize, BlockSize, BlockSize));
             }else if(num==3){
@@ -409,7 +472,7 @@ void OurGameScene::ReadMap() {
                 int random_number = dis(gen);
                 std::string random_number_str = std::to_string(random_number);
                 std::string box_home="our_game/home"+random_number_str+".png";*/
-                Box* box=new Box("our_game/box.png",j * BlockSize+40, i * BlockSize+28);
+                Box* box=new Box("our_game/scarecrow4.png",j * BlockSize+40, i * BlockSize+28);
                 InstrumentGroup->AddNewObject(box);
                 mapBox[i][j]= box;
 
@@ -419,83 +482,6 @@ void OurGameScene::ReadMap() {
 }
 
 void OurGameScene::ConstructUI() {
-    // Background
-    // UIGroup->AddNewObject(new Engine::Image("play/sand.png", 1280, 0, 320, 832));
-    // Text
-    /*
-    UIGroup->AddNewObject(new Engine::Label(std::string("Stage ") + std::to_string(MapId), "pirulen.ttf", 32, 1294, 0));
-    UIGroup->AddNewObject(UIMoney = new Engine::Label(std::string("$") + std::to_string(money), "pirulen.ttf", 24, 1294, 48));
-    UIGroup->AddNewObject(UILives = new Engine::Label(std::string("Life ") + std::to_string(lives), "pirulen.ttf", 24, 1294, 88));
-    UIGroup->AddNewObject(UIScore = new Engine::Label(std::string("Score ") + std::to_string(score), "pirulen.ttf", 24, 1294, 128));
-    TurretButton* btn;
-*/
-    // Button 1
-    /*
-    btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1294, 136+40, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-1.png", 1294, 136 - 8+40, 0, 0, 0, 0)
-            , 1294, 136+40, MachineGunTurret::Price);
-    // Reference: Class Member Function Pointer and std::bind.
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 0));
-    UIGroup->AddNewControlObject(btn);
-    // Button 2
-    btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1370, 136+40, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-2.png", 1370, 136 - 8+40, 0, 0, 0, 0)
-            , 1370, 136+40, LaserTurret::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 1));
-    UIGroup->AddNewControlObject(btn);
-    // Button 3
-    btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1446, 136+40, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-3.png", 1446, 136+40, 0, 0, 0, 0)
-            , 1446, 136+40, MissileTurret::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 2));
-    UIGroup->AddNewControlObject(btn);
-    // TODO: [CUSTOM-TURRET]: Create a button to support constructing the turret.
-    //button 4
-    btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1522, 136+40, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-4.png", 1522, 136+40, 0, 0, 0, 0)
-            , 1522, 136+40, Turret4::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 3));
-    UIGroup->AddNewControlObject(btn);
-    //button 5
-    btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1294, 212+40, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-5.png", 1294, 212+40, 0, 0, 0, 0)
-            , 1294, 212+40, Turret5::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 4));
-    UIGroup->AddNewControlObject(btn);
-    //button 6
-    btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1370, 212+40, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-6.png", 1370, 212+40, 0, 0, 0, 0)
-            , 1370, 212+40, Turret6::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 5));
-    UIGroup->AddNewControlObject(btn);
-    //button 7
-    btn = new TurretButton("play/floor.png", "play/dirt.png",
-                           Engine::Sprite("play/tower-base.png", 1446, 212+40, 0, 0, 0, 0),
-                           Engine::Sprite("play/turret-7.png", 1446, 212+40, 0, 0, 0, 0)
-            , 1446, 212+40, Turret7::Price);
-    btn->SetOnClickCallback(std::bind(&PlayScene::UIBtnClicked, this, 6));
-    UIGroup->AddNewControlObject(btn);
-
-    ResurrectButton* btn2;
-    //button 8 for tool to resurrect
-    btn2 = new ResurrectButton("play/floor.png", "play/dirt.png",
-                               Engine::Sprite("play/tower-base.png", 1294+130, 68, 0, 0, 0, 0),
-                               Engine::Sprite("play/resurrect.png", 1294+130, 68, 0, 0, 0, 0)
-            , 1294+130, 68, Resurrect::Price);
-    btn2->SetOnClickCallback(std::bind(&PlayScene::ResurrectOnclick, this));
-    UIGroup->AddNewControlObject(btn2);
-*/
-
-//the tool on the map can be taken when the player on the same font
-
-
-
     int w = Engine::GameEngine::GetInstance().GetScreenSize().x;
     int h = Engine::GameEngine::GetInstance().GetScreenSize().y;
     int shift = 135 + 25;
@@ -524,13 +510,15 @@ bool OurGameScene::CheckSpaceValid(int x, int y) {
     return false;
 }
 
-void OurGameScene::PutBomb(int x,int y){
+void OurGameScene::PutBomb(int x,int y,Role* r){
     //set the mapState[i][j] to TILE_OCCUPIED
     int i=y/64;
     int j=x/64;
     mapState[i][j]=TILE_OCCUPIED;
     //
     Bomb1* bomb=new Bomb1(j*64+40,i*64+40,3.0);
+    std::cout<<"r->bombRange: "<<r->bombRange<<std::endl;
+    bomb->CollisionRadius=r->bombRange;
     BombGroup->AddNewObject(bomb);
 
 }
@@ -538,7 +526,7 @@ void OurGameScene::ClearBomb(int x,int y,int radius){
     int i=y/64;
     int j=x/64;
     mapState[i][j]=TILE_FLOOR;
-    FireEffect* fireeffect=new FireEffect(j*64+40,i*64+40,3.0);
+    FireEffect* fireeffect=new FireEffect(j*64+40,i*64+40,1.0);
     FireEffectGroup->AddNewObject(fireeffect);
     int dir[4][2]={{1,0},{-1,0},{0,1},{0,-1}};
     for(int k=0;k<4;k++){
@@ -550,9 +538,9 @@ void OurGameScene::ClearBomb(int x,int y,int radius){
             if (I > 0 && J > 0 && I < 13 && J < 25) {
                 //check the player
                 if(mapState[I][J]!=TILE_WALL){
-                    FireEffect* fireeffect=new FireEffect(J*64+40,I*64+40,3.0);
+                    FireEffect* fireeffect=new FireEffect(J*64+40,I*64+40,1.0);
                     FireEffectGroup->AddNewObject(fireeffect);
-                }
+                }else break;
                 CheckDie(I,J);
 
                 if (mapState[I][J] == TILE_BLOCK) {
@@ -564,7 +552,7 @@ void OurGameScene::ClearBomb(int x,int y,int radius){
                             ValidState[I*4+p][J*4+q]=true;
                         }
                     }
-                    break;
+                    //break;
                 }
 
             }
@@ -606,16 +594,50 @@ void OurGameScene::TakeTool(Role* r){
     }
 }
 void OurGameScene::CheckDie(int i,int j){
+    std::cout<<"check\n";
+    std::cout<<"timer4: "<<timer4<<std::endl;
     int x_l=j*64-32;
     int x_r=j*64+32;
     int y_u=i*64-32;
     int y_d=i*64+32;
+    int same1=0;
+    int same2=0;
     if((role1->Position.x >= x_l  && role1->Position.x <= x_r )&& (role1->Position.y >= y_u && role1->Position.y <= y_d)){
-        Engine::GameEngine::GetInstance().ChangeScene("lose");
+        std::cout<<"live:"<<role1->live<<std::endl;
+        if(role1->live>1 && timer3<=0) {
+            timer3=5.0;
+            UIGroup->AddNewObject(UILive = new Engine::Label( std::to_string(role2->live), "pirulen.ttf", 40, role1->Position.x, role1->Position.y));
+            role1->live--;
+            UILive->Text =   std::to_string(role1->live);
+        }
+        else if(role1->live<=1){
+            winner=2;
+            //Engine::GameEngine::GetInstance().ChangeScene("lose");
+            same1=1;
+        }
     }
     if((role2->Position.x >= x_l  && role2->Position.x <= x_r )&& (role2->Position.y >= y_u && role2->Position.y <= y_d)){
+        std::cout<<"live:"<<role2->live<<std::endl;
+        if(role2->live>1 && timer4<=0) {
+            timer4=5.0;
+            UIGroup->AddNewObject(UILive2 = new Engine::Label( std::to_string(role2->live), "pirulen.ttf", 40, role2->Position.x, role2->Position.y));
+            role2->live--;
+            UILive2->Text =   std::to_string(role2->live);
+            //UIGroup->RemoveObject(UILive->GetObjectIterator());
+        }
+        else if(role2->live<=1) {
+            winner=1;
+            //Engine::GameEngine::GetInstance().ChangeScene("lose");
+            same2=1;
+        }
+    }
+    if(same1 && same2){
+        winner=0;
+        Engine::GameEngine::GetInstance().ChangeScene("lose");
+    }else if(same1 || same2){
         Engine::GameEngine::GetInstance().ChangeScene("lose");
     }
+
 }
 
 void OurGameScene::firearmEffect(int x,int y,Role* r){
@@ -647,6 +669,20 @@ void OurGameScene::firearmEffect(int x,int y,Role* r){
             FirearmEffect* firearmeffect=new FirearmEffect(j*64+40,i*64+40,3.0);
             FirearmEffectGroup->AddNewObject(firearmeffect);
         }
+        //CheckDie(i,j);
+
+        if (mapState[i][j] == TILE_BLOCK) {
+            Box* tmp=mapBox[i][j];
+            InstrumentGroup->RemoveObject(tmp->GetObjectIterator());
+            mapState[i][j] = TILE_FLOOR;
+            for(int p=0;p<4;p++){
+                for(int q=0;q<4;q++){
+                    ValidState[i*4+p][j*4+q]=true;
+                }
+            }
+           // break;
+        }
+        //else break;
     }
 }
 

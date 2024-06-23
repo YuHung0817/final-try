@@ -14,7 +14,11 @@ public:
 	void PlayOnClick(int stage);
     void ScoreboardOnClick();
 	void BackOnClick(int stage);
-    void OurGameOnClick();
+	void FarmOnClick();
+
+	void GameOnClick();
+	void StorePotionOnClick();
+	void StoreSeedOnClick();
 };
 
 #endif // STAGESELECTSCENE_HPP

@@ -12,10 +12,15 @@ public:
     static int frameIndex;
     static int dir;
     static bool change;
+    int bombRange=1;
+    int live=1;
+    int speedMult=1;
     void SetDir(int i);
     int ReturnDir() override;
+    //void gettool(std::string type) override;
     Role2(int x, int y);
     virtual void Draw() const override;
+    void init();
 };
 
 #endif //INC_2024_I2P2_TOWERDEFENSE_WITH_ANSWER_ROLE2_HPP

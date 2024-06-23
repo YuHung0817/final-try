@@ -28,6 +28,7 @@ add_executable(2024_I2P2_TowerDefense_with_answer
         UI/Animation/ExplosionEffect.cpp
         UI/Animation/ExplosionEffect.hpp
         Bullet/FireBullet.cpp
+        Bullet/FireBullet.hpp
         Engine/GameEngine.cpp
         Engine/GameEngine.hpp
         Engine/Group.cpp
@@ -87,61 +88,55 @@ add_executable(2024_I2P2_TowerDefense_with_answer
         Scene/WinScene.hpp
 
         # TODO: [HACKATHON-1-SCENE] (2/4) Add the new scene source files here
+        ## Yuli
         Scene/StartScene.cpp
         Scene/StartScene.h
         Scene/SettingsScene.cpp
         Scene/SettingsScene.hpp
+        Scene/ScoreboardScene.cpp
+        Scene/ScoreboardScene.hpp
+        Enemy/MyEnemy.cpp
+        Enemy/MyEnemy.hpp
+        Turret/MyTurret.cpp
+        Turret/MyTurret.hpp
+        Bullet/MyBullet.cpp
+        Bullet/MyBullet.hpp
+
+        Bomb/FireEffect.cpp
+        Bomb/FireEffect.hpp
+        Bomb/HammerEffect.cpp
+        Bomb/HammerEffect.hpp
+        Bomb/FirearmEffect.hpp
+        Bomb/FirearmEffect.cpp
+
+        Scene/FarmScene.cpp
+        Scene/FarmScene.hpp
+        Scene/FarmSelectScene.cpp
+        Scene/FarmSelectScene.hpp
+        Plant/Plant.cpp
+        Plant/Plant.hpp
+        Plant/PlantButton.cpp
+        Plant/PlantButton.hpp
+        Plant/WheatPlant.cpp
+        Plant/WheatPlant.hpp
+        Plant/VegetablePlant.cpp
+        Plant/VegetablePlant.hpp
+        Plant/ApplePlant.cpp
+        Plant/ApplePlant.hpp
+        Plant/FlowerPlant.cpp
+        Plant/FlowerPlant.hpp
+        Plant/SicklePlant.hpp
+        Plant/SicklePlant.cpp
+        ## Yuli
+        ##UI/Component/TextInput.cpp
+        ##UI/Component/TextInput.hpp
+
         Scene/OurGameScene.cpp
         Scene/OurGameScene.hpp
-        Turret/Turret4.cpp
-        Turret/Turret4.hpp
-        Turret/Turret5.cpp
-        Turret/Turret5.hpp
-        Turret/Turret6.cpp
-        Turret/Turret6.hpp
-        Turret/Turret7.cpp
-        Turret/Turret7.hpp
-        Enemy/Enemy4.cpp
-        Enemy/Enemy4.hpp
-        Enemy/Enemy5.cpp
-        Enemy/Enemy5.hpp
-        Enemy/Enemy6.cpp
-        Enemy/Enemy6.hpp
-        Enemy/Enemy7.cpp
-        Enemy/Enemy7.hpp
-        Enemy/Enemy8.cpp
-        Enemy/Enemy8.hpp
-        Enemy/Enemy9.cpp
-        Enemy/Enemy9.hpp
-        Enemy/Enemy10.cpp
-        Enemy/Enemy10.hpp
-        Enemy/Enemy11.cpp
-        Enemy/Enemy11.hpp
-        Scene/ScoredboardScene.cpp
-        Scene/ScoredboardScene.hpp
-        Bullet/Bullet4.cpp
-        Bullet/Bullet4.hpp
-        Bullet/Bullet5.cpp
-        Bullet/Bullet5.hpp
-        Bullet/Bullet6.cpp
-        Bullet/Bullet6.hpp
-        Bullet/Bullet7.cpp
-        Bullet/Bullet7.hpp
-        Bullet/Bullet8.cpp
-        Bullet/Bullet8.hpp
-        Bullet/Bullet9.cpp
-        Bullet/Bullet9.hpp
-        Bullet/Bullet10.cpp
-        Bullet/Bullet10.hpp
-        tool/Tool.cpp
-        tool/Tool.hpp
-        tool/Resurrect.cpp
-        tool/Resurrect.hpp
-        tool/ResurrectButton.cpp
-        tool/ResurrectButton.hpp
-        UI/Component/TextInput.cpp
-        Scene/OurGameScene.cpp
-        Scene/OurGameScene.hpp
+        Turret/TurretButton.hpp
+        Scene/WinScene.cpp
+        Scene/WinScene.hpp
+        
         role/Role.cpp
         role/Role.hpp
         role/Role1.cpp
@@ -164,15 +159,14 @@ add_executable(2024_I2P2_TowerDefense_with_answer
         Instrument/Hammer.hpp
         Instrument/ToolBomb.cpp
         Instrument/ToolBomb.hpp
-        Bomb/FireEffect.cpp
-        Bomb/FireEffect.hpp
-        Bomb/HammerEffect.cpp
-        Bomb/HammerEffect.hpp
-        Bomb/FirearmEffect.cpp
-        Bomb/FirearmEffect.hpp
-        #UI/Component/TextInput.cpp
-        #UI/Component/TextInput.hpp
 
+        Scene/SeedStoreScene.cpp
+        Scene/SeedStoreScene.h
+        Scene/PotionStoreScene.cpp
+        Scene/PotionStoreScene.h
+
+        UI/Component/Window.h
+        UI/Component/Window.cpp
 )
 
 IF (WIN32)

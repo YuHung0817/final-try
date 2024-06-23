@@ -2,7 +2,6 @@
 #include <allegro5/allegro_primitives.h>
 #include <cmath>
 #include <utility>
-#include <iostream>
 
 #include "Enemy/Enemy.hpp"
 #include "Engine/GameEngine.hpp"

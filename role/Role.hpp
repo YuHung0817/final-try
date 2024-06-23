@@ -21,7 +21,7 @@ protected:
     virtual void OnExplode();
     std::queue<std::string> tool;
 public:
-
+    int bombRange=1;
     float reachEndTime;
     Role(std::string img, float x, float y, float radius, float speed, float hp, int money);
     void Hit(float damage);
@@ -31,9 +31,9 @@ public:
     void SetPosition(float x, float y); // 設置角色的位置
     float GetX() const; // 獲取角色的x座標
     float GetY() const; // 獲取角色的y座標
-    void gettool(std::string type);
     std::string UseTool();
     virtual int ReturnDir() =0;
+    void gettool(std::string type);
 };
 
 #endif //INC_2024_I2P2_TOWERDEFENSE_WITH_ANSWER_ROLE_HPP

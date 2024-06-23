@@ -51,8 +51,13 @@ private:
     std::array<bool, ALLEGRO_KEY_MAX> keys;
 protected:
     int SpeedMult;
+    OurGameScene* getGameScene();
 public:
-    static float timer;
+    static int winner;
+    static float timer1;
+    static float timer2;
+    static float timer3;
+    static float timer4;
     static bool DebugMode;
     static const std::vector<Engine::Point> directions;
     static const int MapWidth, MapHeight;
@@ -63,12 +68,15 @@ public:
     float ticks;
     float deathCountDown;
 
+
     static Box* mapBox[25][13];
     static Firearm* mapFirearm[25][13];
     static Bubble* mapBubble[25][13];
     static Hammer* mapHammer[25][13];
     static ToolBomb* mapToolBomb[25][13];
     // Map tiles.
+    Engine::Label* UILive;
+    Engine::Label* UILive2;
     Group* TileMapGroup;
     Group* GroundEffectGroup;
     Group* DebugIndicatorGroup;
@@ -91,7 +99,7 @@ public:
     void Terminate() override;
     void Update(float deltaTime) override;
     void Draw() const override;
-    void PutBomb(int x,int y);
+    void PutBomb(int x,int y,Role* r);
     void ClearBomb(int x,int y,int radius);
     /******/
     /*******/
@@ -106,6 +114,8 @@ public:
     void CheckDie(int i,int j);
     void firearmEffect(int x,int y,Role* r);
     void hammerEffect(int x,int y,Role* r);
+    void SetRole1();
+    void SetRole2();
     // void ModifyReadMapTiles();
 };
 
